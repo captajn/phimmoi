@@ -34,56 +34,72 @@ export default async function Home() {
         </Suspense>
       </div>
 
-      <div className="container mx-auto px-4">
-        <Suspense fallback={<SectionSkeleton />}>
-          <LatestMoviesSection />
-        </Suspense>
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 pb-8 sm:pb-10 md:pb-12">
+        <div className="mt-6 sm:mt-8 md:mt-10">
+          <Suspense fallback={<SectionSkeleton />}>
+            <LatestMoviesSection />
+          </Suspense>
+        </div>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <MovieSection 
-            title="Phim Hàn Quốc"
-            apiSlug="han-quoc"
-            colorClass="text-blue-400"
-          />
-        </Suspense>
+        <div className="mt-6 sm:mt-8 md:mt-10">
+          <Suspense fallback={<SectionSkeleton />}>
+            <MovieSection 
+              title="Phim Hàn Quốc"
+              apiSlug="han-quoc"
+              colorClass="text-blue-400"
+            />
+          </Suspense>
+        </div>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <MovieSection
-            title="Phim Trung Quốc"
-            apiSlug="trung-quoc" 
-            colorClass="text-yellow-400"
-          />
-        </Suspense>
+        <div className="mt-6 sm:mt-8 md:mt-10">
+          <Suspense fallback={<SectionSkeleton />}>
+            <MovieSection
+              title="Phim Trung Quốc"
+              apiSlug="trung-quoc" 
+              colorClass="text-yellow-400"
+            />
+          </Suspense>
+        </div>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <MovieSection
-            title="Phim Âu Mỹ"
-            apiSlug="au-my"
-            colorClass="text-red-400" 
-          />
-        </Suspense>
+        <div className="mt-6 sm:mt-8 md:mt-10">
+          <Suspense fallback={<SectionSkeleton />}>
+            <MovieSection
+              title="Phim Âu Mỹ"
+              apiSlug="au-my"
+              colorClass="text-red-400" 
+            />
+          </Suspense>
+        </div>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <AnimeSection />
-        </Suspense>
+        <div className="mt-6 sm:mt-8 md:mt-10">
+          <Suspense fallback={<SectionSkeleton />}>
+            <AnimeSection />
+          </Suspense>
+        </div>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <VietnameseMoviesSection />
-        </Suspense>
+        <div className="mt-6 sm:mt-8 md:mt-10">
+          <Suspense fallback={<SectionSkeleton />}>
+            <VietnameseMoviesSection />
+          </Suspense>
+        </div>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <PhimBoSection
-            title="Phim Bộ Mới"
-            typeList="phim-bo"
-            sortField="modified.time"
-            sortType="desc"
-            limit={12}
-          />
-        </Suspense>
+        <div className="mt-6 sm:mt-8 md:mt-10">
+          <Suspense fallback={<SectionSkeleton />}>
+            <PhimBoSection
+              title="Phim Bộ Mới"
+              typeList="phim-bo"
+              sortField="modified.time"
+              sortType="desc"
+              limit={12}
+            />
+          </Suspense>
+        </div>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <ThuyetMinhSection />
-        </Suspense>
+        <div className="mt-6 sm:mt-8 md:mt-10">
+          <Suspense fallback={<SectionSkeleton />}>
+            <ThuyetMinhSection />
+          </Suspense>
+        </div>
       </div>
 
       <ScrollToTopButton />

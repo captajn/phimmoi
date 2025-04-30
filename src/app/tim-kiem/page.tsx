@@ -1,45 +1,59 @@
-import { useState, useEffect, useRef } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
-import { MdFilterList, MdKeyboardArrowDown, MdKeyboardArrowUp, MdSearch } from 'react-icons/md';
+'use client'
+
+import { useState, useEffect, useRef, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
+import { MdFilterList, MdKeyboardArrowDown, MdKeyboardArrowUp, MdSearch } from 'react-icons/md'
+import Image from 'next/image'
 
 interface MovieItem {
-  _id: string;
-  name: string;
-  slug: string;
-  thumb_url?: string;
-  poster_url?: string;
-  quality?: string;
-  episode_current?: string;
-  lang?: string;
-  origin_name?: string;
+  _id: string
+  name: string
+  slug: string
+  thumb_url?: string
+  poster_url?: string
+  quality?: string
+  episode_current?: string
+  lang?: string
+  origin_name?: string
 }
 
-export function Search() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [showFilters, setShowFilters] = useState(false);
-  const [categories, setCategories] = useState<{ name: string; slug: string }[]>([]);
-  const [countries, setCountries] = useState<{ name: string; slug: string }[]>([]);
+export default function Search() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-8 pt-[72px] text-white">Đang tải dữ liệu tìm kiếm...</div>}>
+      <SearchContent />
+    </Suspense>
+  )
+}
+
+function SearchContent() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const [showFilters, setShowFilters] = useState(false)
+  const [categories, setCategories] = useState<{ name: string; slug: string }[]>([])
+  const [countries, setCountries] = useState<{ name: string; slug: string }[]>([])
   const [activeFilters, setActiveFilters] = useState({
     country: '',
     category: '',
     year: '',
     sort_lang: ''
-  });
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  })
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const keyword = searchParams.get('q') || '';
-  const page = parseInt(searchParams.get('page') || '1');
+  const keyword = searchParams?.get('q') || ''
+  const page = parseInt(searchParams?.get('page') || '1')
   const [filters, setFilters] = useState({
-    sort_field: searchParams.get('sort_field') || '_id',
-    sort_type: searchParams.get('sort_type') || 'desc',
-    sort_lang: searchParams.get('sort_lang') || '',
-    category: searchParams.get('category') || '',
-    country: searchParams.get('country') || '',
-    year: searchParams.get('year') || '',
+    sort_field: searchParams?.get('sort_field') || '_id',
+    sort_type: searchParams?.get('sort_type') || 'desc',
+    sort_lang: searchParams?.get('sort_lang') || '',
+    category: searchParams?.get('category') || '',
+    country: searchParams?.get('country') || '',
+    year: searchParams?.get('year') || '',
     limit: '24'
-  });
+  })
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,116 +61,130 @@ export function Search() {
         const [categoriesRes, countriesRes] = await Promise.all([
           axios.get('https://phimapi.com/the-loai').then(res => res.data),
           axios.get('https://phimapi.com/quoc-gia').then(res => res.data)
-        ]);
-        setCategories(categoriesRes);
-        setCountries(countriesRes);
+        ])
+        setCategories(categoriesRes)
+        setCountries(countriesRes)
       } catch (error) {
-        console.error('Lỗi khi tải dữ liệu:', error);
+        console.error('Lỗi khi tải dữ liệu:', error)
       }
-    };
-    fetchData();
+    }
+    fetchData()
     
     // Set active filters from URL params
     setActiveFilters({
-      country: searchParams.get('country') || '',
-      category: searchParams.get('category') || '',
-      year: searchParams.get('year') || '',
-      sort_lang: searchParams.get('sort_lang') || ''
-    });
-  }, [searchParams]);
+      country: searchParams?.get('country') || '',
+      category: searchParams?.get('category') || '',
+      year: searchParams?.get('year') || '',
+      sort_lang: searchParams?.get('sort_lang') || ''
+    })
+  }, [searchParams])
 
   // Tự động focus vào ô tìm kiếm khi trang được tải
   useEffect(() => {
     if (searchInputRef.current && !keyword) {
-      searchInputRef.current.focus();
+      searchInputRef.current.focus()
     }
-  }, [keyword]);
+  }, [keyword])
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['searchMovies', keyword, page, filters],
     queryFn: async () => {
       try {
         if (!keyword) {
-          return { data: { items: [], params: { pagination: { totalPages: 1 } } } };
+          return { data: { items: [], params: { pagination: { totalPages: 1 } } } }
         }
 
-        const params = new URLSearchParams();
-        params.append('keyword', keyword);
-        params.append('page', page.toString());
-        params.append('sort_field', filters.sort_field);
-        params.append('sort_type', filters.sort_type);
-        params.append('limit', filters.limit);
+        const params = new URLSearchParams()
+        params.append('keyword', keyword)
+        params.append('page', page.toString())
+        params.append('sort_field', filters.sort_field)
+        params.append('sort_type', filters.sort_type)
+        params.append('limit', filters.limit)
         
         if (filters.sort_lang && filters.sort_lang.trim() !== '') {
-          params.append('sort_lang', filters.sort_lang);
+          params.append('sort_lang', filters.sort_lang)
         }
         
         if (filters.category && filters.category.trim() !== '') {
-          params.append('category', filters.category);
+          params.append('category', filters.category)
         }
         
         if (filters.country && filters.country.trim() !== '') {
-          params.append('country', filters.country);
+          params.append('country', filters.country)
         }
         
         if (filters.year && filters.year.trim() !== '') {
-          params.append('year', filters.year);
+          params.append('year', filters.year)
         }
         
-        const apiUrl = `https://phimapi.com/v1/api/tim-kiem?${params.toString()}`;
-        console.log('Calling API:', apiUrl);
+        const apiUrl = `https://phimapi.com/v1/api/tim-kiem?${params.toString()}`
+        console.log('Calling API:', apiUrl)
         
-        const response = await axios.get(apiUrl);
-        console.log('API Response:', response.data);
-        return response.data;
+        const response = await axios.get(apiUrl)
+        console.log('API Response:', response.data)
+        return response.data
       } catch (err) {
-        console.error('API Error:', err);
-        throw err;
+        console.error('API Error:', err)
+        throw err
       }
     },
     enabled: !!keyword, // Only run query when there's a keyword
     retry: 1
-  });
+  })
 
-  const movies = data?.data?.items || [];
-  const totalPages = data?.data?.params?.pagination?.totalPages || 1;
+  const movies = data?.data?.items || []
+  const totalPages = data?.data?.params?.pagination?.totalPages || 1
 
   const updateFilter = (key: string, value: string) => {
     // If clicking on already active filter, remove it
     if (activeFilters[key as keyof typeof activeFilters] === value) {
-      value = '';
+      value = ''
     }
     
-    const newFilters = { ...filters, [key]: value };
-    setFilters(newFilters);
-    setActiveFilters(prev => ({ ...prev, [key]: value }));
-    setSearchParams({ ...Object.fromEntries(searchParams.entries()), [key]: value, page: '1' });
-  };
+    const newFilters = { ...filters, [key]: value }
+    setFilters(newFilters)
+    setActiveFilters(prev => ({ ...prev, [key]: value }))
+    
+    // Tạo URL mới với tham số đã cập nhật
+    const newParams = new URLSearchParams(searchParams?.toString() || '')
+    if (value) {
+      newParams.set(key, value)
+    } else {
+      newParams.delete(key)
+    }
+    newParams.set('page', '1')
+    
+    router.push(`/tim-kiem?${newParams.toString()}`)
+  }
 
   const handlePageChange = (newPage: number) => {
-    setSearchParams({ ...Object.fromEntries(searchParams.entries()), page: newPage.toString() });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+    // Tạo URL mới với tham số trang đã cập nhật
+    const newParams = new URLSearchParams(searchParams?.toString() || '')
+    newParams.set('page', newPage.toString())
+    
+    router.push(`/tim-kiem?${newParams.toString()}`)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   const getImageUrl = (url?: string) => {
-    if (!url) return '';
-    if (url.startsWith('http')) return url;
-    return `https://phimimg.com${url.startsWith('/') ? '' : '/'}${url}`;
-  };
+    if (!url) return ''
+    if (url.startsWith('http')) return url
+    return `https://phimimg.com${url.startsWith('/') ? '' : '/'}${url}`
+  }
 
   const toggleFilters = () => {
-    setShowFilters(!showFilters);
-  };
+    setShowFilters(!showFilters)
+  }
 
   const getActiveFiltersCount = () => {
-    return Object.values(activeFilters).filter(val => val !== '').length;
-  };
+    return Object.values(activeFilters).filter(val => val !== '').length
+  }
 
   const renderPagination = () => {
-    const pagesToShow = [];
-    const maxButtons = 5;
-    const startPage = Math.max(1, page - Math.floor(maxButtons / 2));
-    const endPage = Math.min(totalPages, startPage + maxButtons - 1);
+    const pagesToShow = []
+    const maxButtons = 5
+    const startPage = Math.max(1, page - Math.floor(maxButtons / 2))
+    const endPage = Math.min(totalPages, startPage + maxButtons - 1)
     
     // Previous button
     if (page > 1) {
@@ -168,7 +196,7 @@ export function Search() {
         >
           <span className="transform rotate-180">›</span>
         </button>
-      );
+      )
     }
     
     // First page
@@ -181,11 +209,11 @@ export function Search() {
         >
           1
         </button>
-      );
+      )
       if (startPage > 2) {
         pagesToShow.push(
           <span key="dots1" className="px-3 py-2 text-gray-500">...</span>
-        );
+        )
       }
     }
     
@@ -203,7 +231,7 @@ export function Search() {
         >
           {i}
         </button>
-      );
+      )
     }
     
     // Last page
@@ -211,7 +239,7 @@ export function Search() {
       if (endPage < totalPages - 1) {
         pagesToShow.push(
           <span key="dots2" className="px-3 py-2 text-gray-500">...</span>
-        );
+        )
       }
       pagesToShow.push(
         <button
@@ -221,7 +249,7 @@ export function Search() {
         >
           {totalPages}
         </button>
-      );
+      )
     }
     
     // Next button
@@ -234,22 +262,22 @@ export function Search() {
         >
           <span>›</span>
         </button>
-      );
+      )
     }
     
     return (
       <div className="flex flex-wrap justify-center gap-2">
         {pagesToShow}
       </div>
-    );
-  };
+    )
+  }
 
   const handleSubmitSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (searchInputRef.current && searchInputRef.current.value.trim()) {
-      setSearchParams({ q: searchInputRef.current.value.trim(), page: '1' });
+      router.push(`/tim-kiem?q=${encodeURIComponent(searchInputRef.current.value.trim())}`)
     }
-  };
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 pt-[72px]">
@@ -397,22 +425,22 @@ export function Search() {
       {getActiveFiltersCount() > 0 && (
         <div className="flex flex-wrap gap-2 mb-4">
           {Object.entries(activeFilters).map(([key, value]) => {
-            if (!value) return null;
+            if (!value) return null
             
-            let displayName = '';
+            let displayName = ''
             if (key === 'country') {
-              displayName = countries.find(c => c.slug === value)?.name || '';
+              displayName = countries.find(c => c.slug === value)?.name || ''
             } else if (key === 'category') {
-              displayName = categories.find(c => c.slug === value)?.name || '';
+              displayName = categories.find(c => c.slug === value)?.name || ''
             } else if (key === 'year') {
-              displayName = `Năm ${value}`;
+              displayName = `Năm ${value}`
             } else if (key === 'sort_lang') {
-              if (value === 'vietsub') displayName = 'Vietsub';
-              if (value === 'thuyet-minh') displayName = 'Thuyết minh';
-              if (value === 'long-tieng') displayName = 'Lồng tiếng';
+              if (value === 'vietsub') displayName = 'Vietsub'
+              if (value === 'thuyet-minh') displayName = 'Thuyết minh'
+              if (value === 'long-tieng') displayName = 'Lồng tiếng'
             }
             
-            if (!displayName) return null;
+            if (!displayName) return null
             
             return (
               <button
@@ -422,7 +450,7 @@ export function Search() {
               >
                 {displayName} <span className="text-xs">×</span>
               </button>
-            );
+            )
           })}
         </div>
       )}
@@ -450,7 +478,7 @@ export function Search() {
             {movies.map((movie: MovieItem) => (
               <Link
                 key={movie._id}
-                to={`/phim/${movie.slug}`}
+                href={`/phim/${movie.slug}`}
                 className="group"
               >
                 <div className="relative aspect-[3/4.5] rounded-xl overflow-hidden bg-gray-900">
@@ -497,5 +525,5 @@ export function Search() {
         </>
       )}
     </div>
-  );
-}
+  )
+} 

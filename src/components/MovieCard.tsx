@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Movie } from '@/types/movie'
 import { MdPlayArrow } from 'react-icons/md'
-import { getOptimizedImageUrl, handleImageError } from '@/utils/image'
+import { getOptimizedImageUrl } from '@/utils/image'
 import { useInView } from '@/utils/performance'
 
 interface MovieCardProps {

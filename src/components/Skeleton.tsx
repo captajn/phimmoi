@@ -144,21 +144,21 @@ export const WatchDetailSkeleton = () => {
 
 export function MovieSliderSkeleton() {
   return (
-    <div className="w-full h-[60vh] sm:h-[65vh] md:h-[70vh] lg:h-[85vh] xl:h-screen bg-gray-800/50 animate-pulse">
+    <div className="w-full h-[50vh] sm:h-[60vh] md:h-[65vh] lg:h-[80vh] xl:h-[90vh] bg-gray-800/50 animate-pulse">
       <div className="absolute bottom-0 left-0 w-full z-[5]">
-        <div className="container mx-auto px-4 pb-8 sm:pb-10 md:pb-14 lg:pb-20">
+        <div className="container mx-auto px-4 pb-10 sm:pb-14 md:pb-16 lg:pb-20">
           <div className="max-w-3xl">
-            <div className="h-8 bg-gray-700/50 w-3/4 rounded mb-4" />
-            <div className="flex gap-2 mb-4">
-              <div className="h-6 bg-gray-700/50 w-16 rounded" />
-              <div className="h-6 bg-gray-700/50 w-16 rounded" />
-              <div className="h-6 bg-gray-700/50 w-16 rounded" />
+            <div className="h-7 sm:h-8 md:h-10 bg-gray-700/50 w-3/4 rounded mb-3 sm:mb-4" />
+            <div className="flex gap-1 sm:gap-2 mb-3 sm:mb-4">
+              <div className="h-5 sm:h-6 bg-gray-700/50 w-12 sm:w-16 rounded" />
+              <div className="h-5 sm:h-6 bg-gray-700/50 w-12 sm:w-16 rounded" />
+              <div className="h-5 sm:h-6 bg-gray-700/50 w-12 sm:w-16 rounded" />
             </div>
-            <div className="space-y-2 mb-6">
-              <div className="h-4 bg-gray-700/50 w-full rounded" />
-              <div className="h-4 bg-gray-700/50 w-3/4 rounded" />
+            <div className="space-y-1 sm:space-y-2 mb-4 sm:mb-6">
+              <div className="h-3 sm:h-4 bg-gray-700/50 w-full rounded" />
+              <div className="h-3 sm:h-4 bg-gray-700/50 w-3/4 rounded" />
             </div>
-            <div className="h-10 bg-gray-700/50 w-32 rounded-full" />
+            <div className="h-8 sm:h-10 bg-gray-700/50 w-24 sm:w-32 rounded-full" />
           </div>
         </div>
       </div>
@@ -168,14 +168,14 @@ export function MovieSliderSkeleton() {
 
 export function SectionSkeleton() {
   return (
-    <div className="px-4 md:px-8 lg:px-12">
-      <div className="h-8 bg-gray-800 w-48 mb-4 rounded animate-pulse" />
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+    <div className="my-4 sm:my-6 md:my-8">
+      <div className="h-7 sm:h-8 bg-gray-800 w-32 sm:w-48 mb-4 rounded animate-pulse" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="animate-pulse">
             <div className="bg-gray-800 aspect-[2/3] rounded-lg mb-2" />
-            <div className="h-4 bg-gray-800 rounded mb-1" />
-            <div className="h-4 bg-gray-800 rounded w-3/4" />
+            <div className="h-3 sm:h-4 bg-gray-800 rounded mb-1" />
+            <div className="h-3 sm:h-4 bg-gray-800 rounded w-3/4" />
           </div>
         ))}
       </div>

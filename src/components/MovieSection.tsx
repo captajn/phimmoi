@@ -33,11 +33,11 @@ export const MovieSection: React.FC<MovieSectionProps> = ({ title, apiSlug, colo
   }, []);
 
   const scrollLeft = () => {
-    if (scrollRef.current) scrollRef.current.scrollLeft -= scrollRef.current.offsetWidth;
+    if (scrollRef.current) scrollRef.current.scrollLeft -= scrollRef.current.offsetWidth * 0.75;
   };
 
   const scrollRight = () => {
-    if (scrollRef.current) scrollRef.current.scrollLeft += scrollRef.current.offsetWidth;
+    if (scrollRef.current) scrollRef.current.scrollLeft += scrollRef.current.offsetWidth * 0.75;
   };
 
   const { data, isLoading } = useQuery({
@@ -86,12 +86,17 @@ export const MovieSection: React.FC<MovieSectionProps> = ({ title, apiSlug, colo
       <section className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
           <div className="h-8 bg-gray-800 w-48 rounded animate-pulse" />
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 bg-gray-800 rounded-full animate-pulse" />
+            <div className="w-10 h-10 bg-gray-800 rounded-full animate-pulse" />
+          </div>
         </div>
-        <div className="grid grid-flow-col auto-cols-[180px] sm:auto-cols-[220px] md:auto-cols-[280px] lg:auto-cols-[300px] gap-4 md:gap-6">
+        <div className="grid grid-flow-col auto-cols-[160px] sm:auto-cols-[200px] md:auto-cols-[240px] lg:auto-cols-[280px] gap-3 sm:gap-4 md:gap-5">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="animate-pulse">
               <div className="aspect-video bg-gray-800 rounded-lg" />
-              <div className="mt-3 h-4 bg-gray-800 rounded w-3/4" />
+              <div className="mt-2 h-4 bg-gray-800 rounded w-3/4" />
+              <div className="mt-1 h-3 bg-gray-800 rounded w-1/2" />
             </div>
           ))}
         </div>
@@ -102,33 +107,41 @@ export const MovieSection: React.FC<MovieSectionProps> = ({ title, apiSlug, colo
   if (!movies.length) return null;
 
   return (
-    <section className="container mx-auto px-4 py-6">
+    <section>
       <div className="flex items-center justify-between mb-6">
         <Link
           href={`/quoc-gia/${apiSlug}`}
-          className="flex items-center gap-2 group"
+          className="flex items-center gap-1.5 sm:gap-2 group"
         >
-          <h2 className={`text-xl md:text-2xl lg:text-3xl font-bold ${colorClass} group-hover:text-yellow-400 transition`}>
+          <h2 className={`text-lg sm:text-xl md:text-2xl font-bold ${colorClass} group-hover:text-yellow-400 transition`}>
             {title}
           </h2>
-          <ChevronRight className={`w-5 h-5 md:w-6 md:h-6 ${colorClass} group-hover:text-yellow-400`} />
+          <ChevronRight className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 ${colorClass} group-hover:text-yellow-400`} />
         </Link>
 
-        {isClient && (
-          <div className="hidden md:flex items-center gap-2">
-            <button onClick={scrollLeft} className="p-2 md:p-3 rounded-full bg-gray-800 hover:bg-gray-700 transition">
-              <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-white" />
-            </button>
-            <button onClick={scrollRight} className="p-2 md:p-3 rounded-full bg-gray-800 hover:bg-gray-700 transition">
-              <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-white" />
-            </button>
-          </div>
-        )}
+        <div className="flex items-center gap-2" style={{ opacity: isClient ? 1 : 0 }}>
+          <button 
+            onClick={scrollLeft} 
+            className="p-2 sm:p-2.5 md:p-3 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors"
+            aria-label="Scroll left"
+            disabled={!isClient}
+          >
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+          </button>
+          <button 
+            onClick={scrollRight} 
+            className="p-2 sm:p-2.5 md:p-3 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors"
+            aria-label="Scroll right"
+            disabled={!isClient}
+          >
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+          </button>
+        </div>
       </div>
 
       <div
         ref={scrollRef}
-        className="grid grid-flow-col auto-cols-[180px] sm:auto-cols-[220px] md:auto-cols-[280px] lg:auto-cols-[300px] gap-4 md:gap-6 overflow-x-auto scroll-smooth [&::-webkit-scrollbar]:hidden"
+        className="grid grid-flow-col auto-cols-[160px] sm:auto-cols-[200px] md:auto-cols-[240px] lg:auto-cols-[280px] gap-3 sm:gap-4 md:gap-5 overflow-x-auto scroll-smooth [&::-webkit-scrollbar]:hidden pb-2"
       >
         {movies.map((movie: MovieItem, index: number) => (
           <Link
@@ -148,23 +161,21 @@ export const MovieSection: React.FC<MovieSectionProps> = ({ title, apiSlug, colo
                   target.onerror = null;
                 }}
               />
-              {isClient && (
-                <div className="absolute top-2 left-2 right-2 flex justify-between items-start">
-                  {movie.episode_current && (
-                    <span className="px-2 py-1 bg-pink-500 text-white text-xs md:text-sm rounded">
-                      {movie.episode_current}
-                    </span>
-                  )}
-                  {movie.quality && (
-                    <span className="px-2 py-1 bg-yellow-500 text-black text-xs md:text-sm font-medium rounded">
-                      {movie.quality}
-                    </span>
-                  )}
-                </div>
-              )}
+              <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 right-1.5 sm:right-2 flex justify-between items-start">
+                {movie.episode_current && (
+                  <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-pink-500 text-white text-[10px] sm:text-xs md:text-sm rounded">
+                    {movie.episode_current}
+                  </span>
+                )}
+                {movie.quality && (
+                  <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-yellow-500 text-black text-[10px] sm:text-xs md:text-sm font-medium rounded">
+                    {movie.quality}
+                  </span>
+                )}
+              </div>
               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <h3 className="mt-3 text-white text-sm md:text-base font-medium line-clamp-2 group-hover:text-yellow-400 transition-colors">
+            <h3 className="mt-2 text-white text-xs sm:text-sm md:text-base font-medium line-clamp-2 group-hover:text-yellow-400 transition-colors">
               {movie.name}
             </h3>
           </Link>

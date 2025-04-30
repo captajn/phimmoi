@@ -34,8 +34,14 @@ export function Layout({ children }: LayoutProps) {
   const [countries, setCountries] = useState<{ name: string; slug: string }[]>([]);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const menuBtnRef = useRef<HTMLButtonElement>(null);
+  const [isClient, setIsClient] = useState(false);
 
-  const pathname = usePathname();
+  const pathname = usePathname() || '';
+
+  // Đánh dấu khi component đã được render ở client
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -71,6 +77,25 @@ export function Layout({ children }: LayoutProps) {
     }
   }, [isSearchActive]);
 
+  // Thêm handler để xử lý event scroll ở client
+  useEffect(() => {
+    const handleScroll = () => {
+      const header = document.getElementById('main-header');
+      if (header) {
+        if (window.scrollY > 10) {
+          header.classList.add('header-scrolled');
+        } else {
+          header.classList.remove('header-scrolled');
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -93,12 +118,12 @@ export function Layout({ children }: LayoutProps) {
   };
 
   const renderDropdown = (label: string, items: { name: string; slug: string }[], basePath: string) => (
-    <div className="relative group py-2 flex justify-center text-center z-50">
-      <button className="text-white hover:text-yellow-400 text-base font-semibold shadow-text whitespace-nowrap">
+    <div className="relative group">
+      <button className="text-white hover:text-yellow-400 text-sm font-medium px-2 py-2">
         {label}
         <span className="ml-1">▾</span>
       </button>
-      <div className="absolute left-0 md:left-1/2 md:-translate-x-1/2 top-full header-dropdown rounded-md shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-40">
+      <div className="absolute left-0 top-full header-dropdown rounded-md shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-40">
         <div className="p-3 min-w-[220px]">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
             {items.map((item, idx) => (
@@ -116,15 +141,18 @@ export function Layout({ children }: LayoutProps) {
     </div>
   );
 
+  // Luôn áp dụng header trong suốt cho tất cả các trang
+  const isTransparentHeader = true;
+
   return (
-    <div className="min-h-screen bg-gray-900">
-      <style>{`
+    <div className="min-h-screen bg-gray-900" suppressHydrationWarning>
+      <style jsx global>{`
         .shadow-text {
-          text-shadow: 0 4px 8px rgba(0,0,0,1);
+          text-shadow: 0 2px 4px rgba(0,0,0,0.9);
         }
         .menu-item {
-          text-shadow: 0 4px 8px rgba(0,0,0,1);
-          font-weight: 600;
+          text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+          font-weight: 500;
           position: relative;
         }
         .menu-item:after {
@@ -141,16 +169,29 @@ export function Layout({ children }: LayoutProps) {
           width: 100%;
         }
         .header-dropdown {
-          background: rgba(10, 10, 10, 0.4);
+          background: rgba(10, 10, 10, 0.7);
           backdrop-filter: blur(10px);
           border: 1px solid rgba(255, 255, 255, 0.1);
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         
+        /* Header trong suốt */
         .transparent-header {
           background-color: transparent !important;
           box-shadow: none !important;
           border: none !important;
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          z-index: 100;
+          transition: background-color 0.3s ease;
+        }
+        
+        /* Khi cuộn xuống, thêm background mờ */
+        .header-scrolled {
+          background-color: rgba(17, 24, 39, 0.85) !important; 
+          backdrop-filter: blur(8px);
         }
 
         @media (max-width: 768px) {
@@ -158,137 +199,124 @@ export function Layout({ children }: LayoutProps) {
             text-shadow: 0 3px 6px rgba(0,0,0,1);
           }
         }
-        
-        @media (min-width: 768px) {
-          .transparent-header {
-            display: flex;
-            justify-content: space-around; /* Canh đều các mục */
-            align-items: center;
-            width: 100%;
-            padding: 0 4px;
-          }
-          .transparent-header > * {
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 2px;
-          }
-          .header-dropdown {
-            width: 300px;
-            left: 50%;
-            transform: translateX(-50%);
-          }
-          .transparent-header .menu-item,
-          .transparent-header button {
-            font-size: 14px;
-          }
-        }
-
-        @media (min-width: 1024px) {
-          .header-dropdown {
-            width: 450px;
-          }
-        }
       `}</style>
       
-      <header className="fixed top-0 left-0 right-0 w-full z-[9999]">
-        <div className="bg-transparent">
-          <div className="container mx-auto px-4 pt-2">
-            <div className="flex items-center h-20">
-              <div className="grid grid-cols-3 items-center w-full md:flex md:w-auto">
-                <div className="flex justify-start">
-                  <button
-                    ref={menuBtnRef}
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="flex items-center justify-center text-white md:hidden shadow-text menu-shadow-mobile"
-                    aria-label="Menu"
-                  >
-                    {isMobileMenuOpen ? <MdClose size={28} /> : <MdMenu size={28} />}
-                  </button>
-                </div>
-                
-                <div className="flex justify-center md:justify-start">
-                  <Link href="/" className="flex items-center md:mr-3 lg:mr-4">
-                    <Image 
-                      src="/images/logo.png"
-                      alt="PhimMoi Logo"
-                      width={120}
-                      height={40}
-                      priority
-                    />
-                  </Link>
-                </div>
-
-                <div className="flex justify-end">
-                  <button
-                    onClick={toggleSearch}
-                    className="md:hidden flex items-center justify-center text-white shadow-text menu-shadow-mobile"
-                    aria-label="Search"
-                  >
-                    <MdSearch size={26} />
-                  </button>
-                </div>
-              </div>
+      <header className={`fixed w-full z-[9999] ${isTransparentHeader ? 'transparent-header' : 'bg-gray-900/95 backdrop-blur-sm shadow-md'}`} id="main-header" suppressHydrationWarning>
+        <div className="container mx-auto px-3 md:px-4" suppressHydrationWarning>
+          <div className="flex items-center justify-between h-16" suppressHydrationWarning>
+            {/* Left side: Mobile menu button and logo */}
+            <div className="flex items-center" suppressHydrationWarning>
+              <button
+                ref={menuBtnRef}
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="flex items-center justify-center text-white md:hidden shadow-text menu-shadow-mobile mr-3"
+                aria-label="Menu"
+              >
+                {isMobileMenuOpen ? <MdClose size={28} /> : <MdMenu size={28} />}
+              </button>
+              
+              <Link href="/" className="flex items-center">
+                <span className="text-white text-xl font-bold">KhoPhim</span>
+              </Link>
+            </div>
             
-              <div className="hidden md:block md:flex-shrink-0 md:ml-1 md:mr-0 lg:mr-1"> {/* Giảm margin để sát hơn */}
-                <div className="relative w-[140px] lg:w-[240px]">
-                  <form onSubmit={handleSearch} className="relative w-full">
+            {/* Center: Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-1" suppressHydrationWarning>
+              <div className="flex items-center">
+                {/* Desktop Search Form */}
+                <div className="relative mr-4">
+                  <form onSubmit={handleSearch} className="relative">
                     <input
                       type="text"
-                      placeholder="Tìm phim..."
+                      placeholder="Tìm kiếm phim, diễn viên"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full h-8 md:h-8 lg:h-10 px-3 pl-8 rounded-full bg-black/20 text-white placeholder-gray-300 border border-white/10 focus:border-white/30 focus:outline-none text-xs md:text-sm backdrop-blur-sm"
+                      className="w-[180px] h-9 px-3 pl-8 rounded-full bg-white/10 text-white placeholder-gray-300 border border-white/10 focus:border-white/30 focus:outline-none text-sm backdrop-blur-sm"
                     />
-                    <MdSearch className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4 md:w-4 md:h-4 lg:w-5 lg:h-5" />
+                    <MdSearch className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4" />
                   </form>
                 </div>
-              </div>
-            
-              <nav className="hidden md:flex md:flex-grow items-center justify-around md:space-x-2 lg:space-x-3 transparent-header"> {/* Giảm space-x để sát hơn và dùng justify-around */}
-                <Link href="/duyet-tim" className="text-white hover:text-yellow-400 text-base menu-item transition-colors py-2 text-center whitespace-nowrap">
+                
+                <Link href="/duyet-tim" className="text-white hover:text-yellow-400 text-sm font-medium px-4 py-2">
                   Duyệt Tìm
                 </Link>
-                {renderDropdown('Phim', types, 'danh-sach')}
-                {renderDropdown('Thể Loại', categories, 'the-loai')}
-                {renderDropdown('Quốc Gia', countries, 'quoc-gia')}
-              </nav>
-            
-              <div className="hidden md:block md:flex-shrink-0 ml-auto">
-                <Link href="/login" className="flex items-center bg-yellow-500 hover:bg-yellow-600 text-black rounded-full py-0.5 px-2 md:px-3 lg:py-1.5 lg:px-5 text-xs md:text-xs lg:text-sm font-medium transition-colors shadow-md whitespace-nowrap">
-                  Đăng Nhập
-                </Link>
+
+                <div className="relative group">
+                  <button className="text-white hover:text-yellow-400 text-sm font-medium px-4 py-2">
+                    Phim
+                    <span className="ml-1">▾</span>
+                  </button>
+                  <div className="absolute left-0 top-full header-dropdown rounded-md shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-40">
+                    <div className="p-3 min-w-[220px]">
+                      <div className="grid grid-cols-1 gap-1">
+                        {types.map((item, idx) => (
+                          <Link
+                            key={idx}
+                            href={`/danh-sach/${item.slug}`}
+                            className="px-3 py-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded text-sm font-medium"
+                          >
+                            {item.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {isClient && renderDropdown('Thể loại', categories, 'the-loai')}
+                
+                {isClient && renderDropdown('Quốc gia', countries, 'quoc-gia')}
               </div>
+            </nav>
+          
+            {/* Right side: Login */}
+            <div className="flex items-center" suppressHydrationWarning>
+              {/* Mobile search button */}
+              <button
+                onClick={toggleSearch}
+                className="md:hidden flex items-center justify-center text-white mr-3"
+                aria-label="Search"
+              >
+                <MdSearch size={26} />
+              </button>
+              
+              {/* Login Button */}
+              <Link 
+                href="/login" 
+                className="flex items-center justify-center bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-4 py-1.5 rounded-full text-sm transition-all shadow-md"
+              >
+                Đăng nhập
+              </Link>
             </div>
-            
-            <div className={`md:hidden overflow-hidden transition-all duration-300 ${
-              isSearchActive ? 'max-h-16 opacity-100 visible' : 'max-h-0 opacity-0 invisible'
-            }`}>
-              <form onSubmit={handleSearch} className="relative w-full py-3">
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  placeholder="Tìm kiếm phim, diễn viên..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-10 px-4 pl-10 rounded-full bg-black/40 text-white placeholder-gray-300 border border-white/10 focus:outline-none text-sm backdrop-blur-sm"
-                />
-                <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-5 h-5" />
-                <button 
-                  type="button" 
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300"
-                  onClick={toggleSearch}
-                >
-                  <MdClose size={20} />
-                </button>
-              </form>
-            </div>
+          </div>
+          
+          {/* Mobile Search bar (expanded when active) */}
+          <div className={`md:hidden overflow-hidden transition-all duration-300 ${
+            isSearchActive ? 'max-h-16 opacity-100 visible' : 'max-h-0 opacity-0 invisible'
+          }`}>
+            <form onSubmit={handleSearch} className="relative w-full py-3">
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Tìm kiếm phim, diễn viên..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-10 px-4 pl-10 rounded-full bg-black/40 text-white placeholder-gray-300 border border-white/10 focus:outline-none text-sm backdrop-blur-sm"
+              />
+              <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-5 h-5" />
+              <button 
+                type="button" 
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300"
+                onClick={toggleSearch}
+              >
+                <MdClose size={20} />
+              </button>
+            </form>
           </div>
         </div>
       </header>
 
-      {isMobileMenuOpen && (
+      {isClient && isMobileMenuOpen && (
         <div className="fixed inset-0 z-[99999] md:hidden">
           <div
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
@@ -298,7 +326,7 @@ export function Layout({ children }: LayoutProps) {
             <div className="p-5">
               <div className="flex items-center justify-between mb-6">
                 <Link href="/" className="flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Image src="/images/logo.png" alt="PhimMoi Logo" width={120} height={40} priority />
+                  <span className="text-white text-xl font-bold">KhoPhim</span>
                 </Link>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -396,7 +424,7 @@ export function Layout({ children }: LayoutProps) {
                   className="block py-2 px-4 bg-yellow-500 hover:bg-yellow-600 text-black font-medium rounded-md transition-colors text-center mt-4"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Đăng nhập / Đăng ký
+                  Đăng nhập
                 </Link>
               </div>
             </div>
@@ -404,7 +432,7 @@ export function Layout({ children }: LayoutProps) {
         </div>
       )}
 
-      <main className={`relative z-0 ${pathname === '/' ? 'pt-0 home-page' : 'pt-16'}`}>
+      <main className="relative z-0 pt-0" suppressHydrationWarning>
         {children}
       </main>
       <footer className="bg-[#121212] text-white py-6 mt-8">
@@ -422,13 +450,7 @@ export function Layout({ children }: LayoutProps) {
 
           <div className="flex flex-col items-center mb-4">
             <Link href="/" className="flex items-center mb-3">
-              <Image 
-                src="/images/logo.png" 
-                alt="Logo" 
-                width={120} 
-                height={40} 
-                priority 
-              />
+              <span className="text-white text-xl font-bold">KhoPhim</span>
             </Link>
             
             <div className="flex space-x-3 mb-3">

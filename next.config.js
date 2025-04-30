@@ -22,9 +22,19 @@ const nextConfig = {
   compress: true,
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3000'],
+      allowedOrigins: ['localhost:3000', 'localhost:3001', 'phim.chjbi.net'],
       bodySizeLimit: '2mb'
     }
+  },
+  assetPrefix: process.env.NODE_ENV === 'production' ? './' : '',
+  pageExtensions: ['tsx', 'ts', 'jsx', 'js', 'mdx'],
+  onDemandEntries: {
+    maxInactiveAge: 60 * 60 * 1000,
+    pagesBufferLength: 5,
+  },
+  webpack: (config) => {
+    // Chúng ta có thể thêm các quy tắc loại trừ thư mục pages ở đây nếu cần
+    return config;
   },
   async headers() {
     return [
@@ -38,6 +48,22 @@ const nextConfig = {
         ],
       },
     ]
+  },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: '/:path*',
+          has: [
+            {
+              type: 'host',
+              value: 'phim.chjbi.net',
+            },
+          ],
+          destination: '/:path*',
+        },
+      ],
+    }
   },
 }
 

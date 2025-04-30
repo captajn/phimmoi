@@ -15,6 +15,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi" suppressHydrationWarning>
+      <head>
+        <meta charSet="utf-8" />
+        <base href="/" />
+      </head>
       <body className={inter.className}>
         <Providers>
           <Layout>{children}</Layout>

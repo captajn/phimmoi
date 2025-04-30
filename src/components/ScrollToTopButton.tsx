@@ -24,10 +24,10 @@ export function ScrollToTopButton() {
   return (
     <button
       onClick={scrollToTop}
-      className="fixed bottom-8 right-8 p-3 bg-gray-800 hover:bg-gray-700 rounded-full shadow-lg transition-all"
+      className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 p-2 sm:p-2.5 md:p-3 bg-gray-800/80 hover:bg-gray-700 rounded-full shadow-lg transition-all z-50 backdrop-blur-sm"
       aria-label="Cuộn lên đầu trang"
     >
-      <MdKeyboardArrowUp className="w-6 h-6 text-white" />
+      <MdKeyboardArrowUp className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
     </button>
   )
 } 

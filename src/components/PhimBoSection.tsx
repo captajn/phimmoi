@@ -162,12 +162,12 @@ export const PhimBoSection: React.FC<PhimBoSectionProps> = ({
     return (
       <section className="container mx-auto px-4 py-6">
         <Link href={`/danh-sach/${typeList}`} className="flex items-center gap-2 mb-6 group">
-          <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-purple-400 group-hover:text-yellow-400 transition">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-purple-400 group-hover:text-yellow-400 transition">
             {title}
           </h2>
           <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-purple-400 group-hover:text-yellow-400" />
         </Link>
-        <div className="min-h-[200px] rounded-3xl overflow-hidden bg-gray-900 flex items-center justify-center">
+        <div className="min-h-[250px] sm:min-h-[300px] md:min-h-[400px] rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden bg-gray-900 flex items-center justify-center">
           <p className="text-gray-400">Không tìm thấy dữ liệu phim</p>
         </div>
       </section>
@@ -186,48 +186,30 @@ export const PhimBoSection: React.FC<PhimBoSectionProps> = ({
   return (
     <section className="container mx-auto px-4 py-6">
       <Link href={`/danh-sach/${typeList}`} className="flex items-center gap-2 mb-6 group">
-        <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-purple-400 group-hover:text-yellow-400 transition">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-purple-400 group-hover:text-yellow-400 transition">
           {title}
         </h2>
         <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-purple-400 group-hover:text-yellow-400" />
       </Link>
 
-      <div className="relative min-h-[400px] md:min-h-[500px] lg:min-h-[600px] rounded-3xl overflow-hidden bg-gray-900">
-        {isClient && (
-          <>
-            {/* Nút điều hướng cho desktop */}
-            <div className="absolute top-1/2 left-4 right-4 -translate-y-1/2 z-10 hidden md:flex justify-between pointer-events-none">
-              <button
-                onClick={handlePrevious}
-                className="p-2 md:p-3 lg:p-4 rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm transition pointer-events-auto"
-              >
-                <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" />
-              </button>
-              <button
-                onClick={handleNext}
-                className="p-2 md:p-3 lg:p-4 rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm transition pointer-events-auto"
-              >
-                <ChevronRight className="w-6 h-6 md:w-8 md:h-8" />
-              </button>
-            </div>
-
-            {/* Nút điều hướng cho mobile */}
-            <div className="absolute bottom-28 left-4 right-4 z-10 flex justify-between md:hidden">
-              <button
-                onClick={handlePrevious}
-                className="p-2 rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm transition"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                onClick={handleNext}
-                className="p-2 rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm transition"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-          </>
-        )}
+      <div className="relative min-h-[300px] sm:min-h-[350px] md:min-h-[400px] rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden bg-gray-900">
+        {/* Nút điều hướng */}
+        <div className="absolute top-1/2 left-2 right-2 sm:left-4 sm:right-4 -translate-y-1/2 z-10 flex justify-between pointer-events-none" style={{ opacity: isClient ? 1 : 0 }}>
+          <button
+            onClick={handlePrevious}
+            className="p-1.5 sm:p-2 md:p-3 lg:p-4 rounded-full bg-black/60 hover:bg-black/70 text-white backdrop-blur-sm transition pointer-events-auto"
+            disabled={!isClient}
+          >
+            <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6 md:w-8 md:h-8" />
+          </button>
+          <button
+            onClick={handleNext}
+            className="p-1.5 sm:p-2 md:p-3 lg:p-4 rounded-full bg-black/60 hover:bg-black/70 text-white backdrop-blur-sm transition pointer-events-auto"
+            disabled={!isClient}
+          >
+            <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6 md:w-8 md:h-8" />
+          </button>
+        </div>
 
         <div className="absolute inset-0">
           <img 
@@ -244,71 +226,69 @@ export const PhimBoSection: React.FC<PhimBoSectionProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 lg:p-10">
+        <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 md:p-6 lg:p-8">
           <div className="w-full max-w-3xl">
-            <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 text-white">
+            <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-1.5 sm:mb-2 md:mb-3 text-white line-clamp-2">
               {movie.name}
             </h3>
-            <p className="text-white/80 text-sm sm:text-base mb-4 sm:mb-6 line-clamp-2 sm:line-clamp-3">
+            <p className="text-white/80 text-xs sm:text-sm md:text-base mb-3 sm:mb-4 md:mb-5 line-clamp-2 sm:line-clamp-3">
               {detail?.content}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4">
               <Link 
                 href={`/phim/${movie.slug}`}
-                className="flex-1 bg-white/10 hover:bg-white/20 text-white rounded-full px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 font-medium transition flex items-center justify-center gap-2 text-sm sm:text-base"
+                className="flex-1 bg-white/10 hover:bg-white/20 text-white rounded-full px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 font-medium transition flex items-center justify-center gap-1.5 text-xs sm:text-sm md:text-base"
               >
                 Chi Tiết
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
               </Link>
 
-              <div className="flex-1 bg-white/10 rounded-full px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 text-white font-medium text-center text-sm sm:text-base">
+              <div className="flex-1 bg-white/10 rounded-full px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 text-white font-medium text-center text-xs sm:text-sm md:text-base">
                 {status}
               </div>
 
               <Link 
                 href={firstEpisode ? `/xem/${movie.slug}/${serverType}/${firstEpisode}` : `/phim/${movie.slug}`}
-                className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black rounded-full px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 font-semibold transition flex items-center justify-center gap-2 text-sm sm:text-base"
+                className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black rounded-full px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 font-semibold transition flex items-center justify-center gap-1.5 text-xs sm:text-sm md:text-base"
               >
                 Xem Phim
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
               </Link>
             </div>
           </div>
         </div>
       </div>
 
-      {isClient && (
-        <div className="flex justify-center gap-2 mt-4">
-          <div className="scroller-module_scroll-inner__FnFoF no-scrollbar">
-            <div className="flex gap-2">
-              {movies.map((m: Movie, idx: number) => (
-                <div
-                  key={m.slug || idx}
-                  className={`shrink-0 cursor-pointer ${
-                    currentIndex === idx
-                      ? 'border-primary border-2 scale-110'
-                      : ''
-                  }`}
-                  onClick={() => setCurrentIndex(idx)}
-                >
-                  <img 
-                    src={getImageUrl(m.thumb_url || m.poster_url)} 
-                    alt={m.name}
-                    className="w-8 h-8 md:w-12 md:h-12 rounded-full object-cover"
-                    loading="lazy"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = DEFAULT_PLACEHOLDER;
-                      target.onerror = null;
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
+      <div className="flex justify-center mt-3 sm:mt-4" style={{ opacity: isClient && movies.length > 1 ? 1 : 0 }}>
+        <div className="overflow-x-auto no-scrollbar">
+          <div className="flex gap-1.5 sm:gap-2">
+            {movies.map((m: Movie, idx: number) => (
+              <div
+                key={m.slug || idx}
+                className={`shrink-0 cursor-pointer transition ${
+                  currentIndex === idx
+                    ? 'border-2 border-yellow-500 scale-110 z-10'
+                    : 'border border-transparent hover:border-white/50'
+                }`}
+                onClick={() => isClient ? setCurrentIndex(idx) : null}
+              >
+                <img 
+                  src={getImageUrl(m.thumb_url || m.poster_url)} 
+                  alt={m.name}
+                  className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 rounded-full object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = DEFAULT_PLACEHOLDER;
+                    target.onerror = null;
+                  }}
+                />
+              </div>
+            ))}
           </div>
         </div>
-      )}
+      </div>
     </section>
   );
 };

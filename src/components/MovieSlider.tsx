@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef, memo, useCallback, useMemo } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay } from 'swiper/modules';
+import { Autoplay, EffectFade } from 'swiper/modules';
 import Link from 'next/link';
 import { Play } from 'lucide-react';
 import type { Swiper as SwiperType } from 'swiper';
@@ -10,6 +10,8 @@ import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 
 import 'swiper/css';
+import 'swiper/css/effect-fade';
+
 import { getOptimizedImageUrl, getImagePlaceholder } from '../utils/image';
 import { api } from '../services/api';
 import type { Movie } from '../types/movie';
@@ -214,17 +216,17 @@ export const MovieSlider = memo(({ movies }: MovieSliderProps) => {
           max-width: 100%;
         }
         .slider-overlay {
-          background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 35%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.2) 75%, rgba(0,0,0,0) 100%);
+          background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 35%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0) 100%);
         }
         .slider-side-overlay {
-          background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 25%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 85%);
+          background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 25%, rgba(0,0,0,0) 75%);
         }
-        @media (max-width: 1023px) {
+        @media (min-width: 1024px) {
           .slider-overlay {
-            background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 35%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.3) 75%, rgba(0,0,0,0) 100%);
+            background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 35%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 100%);
           }
           .slider-side-overlay {
-            background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 25%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0) 75%);
+            background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 25%, rgba(0,0,0,0) 85%);
           }
         }
         .category-item {
@@ -240,15 +242,60 @@ export const MovieSlider = memo(({ movies }: MovieSliderProps) => {
             display: none;
           }
         }
+        .thumbnail-container {
+          position: absolute;
+          z-index: 10;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: center;
+          gap: 0.25rem;
+          background-color: rgba(0, 0, 0, 0.3);
+          backdrop-filter: blur(4px);
+          padding: 0.375rem 0.5rem;
+          border-radius: 9999px;
+          width: fit-content;
+          margin-left: auto;
+          margin-right: auto;
+          left: 50%;
+          transform: translateX(-50%);
+        }
+        @media (max-width: 640px) {
+          .thumbnail-container {
+            bottom: 35%;
+          }
+        }
+        @media (min-width: 641px) and (max-width: 768px) {
+          .thumbnail-container {
+            bottom: 32%;
+          }
+        }
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .thumbnail-container {
+            bottom: 30%;
+          }
+        }
+        @media (min-width: 1025px) and (max-width: 1280px) {
+          .thumbnail-container {
+            bottom: 28%;
+          }
+        }
+        @media (min-width: 1281px) {
+          .thumbnail-container {
+            bottom: 28%;
+          }
+        }
       `}</style>
       <Swiper
-        modules={[Autoplay]}
+        modules={[Autoplay, EffectFade]}
         spaceBetween={0}
         slidesPerView={1}
         onSwiper={(swiper) => (swiperRef.current = swiper)}
         onSlideChange={handleSlideChange}
         autoplay={{ delay: 5000, disableOnInteraction: false }}
-        className="w-full h-[60vh] sm:h-[65vh] md:h-[70vh] lg:h-[85vh] xl:h-screen"
+        effect="fade"
+        className="w-full h-[50vh] sm:h-[60vh] md:h-[65vh] lg:h-[80vh] xl:h-[90vh]"
+        fadeEffect={{ crossFade: true }}
       >
         {visibleMovies.map((movie, idx) => {
           const info = details[movie.slug];
@@ -262,7 +309,7 @@ export const MovieSlider = memo(({ movies }: MovieSliderProps) => {
                     className="object-cover"
                     fill
                     priority={idx === 0}
-                    sizes="100vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
                     quality={idx === 0 ? 100 : 75}
                     placeholder="blur"
                     blurDataURL={getImagePlaceholder('backdrop')}
@@ -271,59 +318,59 @@ export const MovieSlider = memo(({ movies }: MovieSliderProps) => {
                 <div className="absolute inset-0 slider-overlay z-[1]" />
                 <div className="absolute inset-0 slider-side-overlay z-[1]" />
                 <div className="absolute bottom-0 left-0 w-full z-[5]">
-                  <div className="container mx-auto px-4 pb-8 sm:pb-10 md:pb-14 lg:pb-20">
+                  <div className="container mx-auto px-4 pb-10 sm:pb-14 md:pb-16 lg:pb-20 xl:pb-24">
                     <div className="max-w-3xl text-white">
                       <div className="w-full overflow-hidden">
-                        <h1 className="font-bold mb-2 text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white movie-title">
+                        <h1 className="font-bold mb-2 text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white movie-title">
                           {info?.name || movie.name}
                         </h1>
                       </div>
-                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 md:gap-3 mb-3 text-xs sm:text-xs md:text-sm">
+                      <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 md:gap-2 mb-2 sm:mb-3 text-[10px] sm:text-xs md:text-sm">
                         {info && getImdbRating(info.imdb) !== '' && (
-                          <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-yellow-500 rounded text-black font-bold">
+                          <span className="px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-yellow-500 rounded text-black font-bold">
                             IMDb {getImdbRating(info.imdb)}
                           </span>
                         )}
                         {(info?.time || movie.time) && (
-                          <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
+                          <span className="px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
                             {info?.time || movie.time}
                           </span>
                         )}
                         {(info?.quality || movie.quality) && (
-                          <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
+                          <span className="px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
                             {info?.quality || movie.quality || 'HD'}
                           </span>
                         )}
                         {(info?.episode_current || movie.episode_current) && (
-                          <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-red-500/90 backdrop-blur-sm rounded font-medium text-white">
+                          <span className="px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-red-500/90 backdrop-blur-sm rounded font-medium text-white">
                             {info?.episode_current || movie.episode_current}
                           </span>
                         )}
-                        <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
+                        <span className="px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
                           {info?.lang || movie.lang || 'Vietsub'}
                         </span>
-                        <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
+                        <span className="px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
                           {info?.year || movie.year || '2025'}
                         </span>
                       </div>
                       {info && info.category && info.category.length > 0 ? (
-                        <div className="flex flex-wrap gap-1.5 sm:gap-2 md:gap-3 text-white text-xs sm:text-xs md:text-sm mb-3">
+                        <div className="flex flex-wrap gap-1 sm:gap-1.5 md:gap-2 text-white text-[10px] sm:text-xs md:text-sm mb-2 sm:mb-3">
                           {info.category.map((cat: { name: string }, i: number) => (
-                            <span key={i} className="category-item px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">{cat.name}</span>
+                            <span key={i} className="category-item px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">{cat.name}</span>
                           ))}
                         </div>
                       ) : (
-                        <div className="flex flex-wrap gap-1.5 sm:gap-2 md:gap-3 text-white text-xs sm:text-xs md:text-sm mb-3">
-                          <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">Phim Hay</span>
-                          <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">Mới Cập Nhật</span>
+                        <div className="flex flex-wrap gap-1 sm:gap-1.5 md:gap-2 text-white text-[10px] sm:text-xs md:text-sm mb-2 sm:mb-3">
+                          <span className="px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">Phim Hay</span>
+                          <span className="px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">Mới Cập Nhật</span>
                         </div>
                       )}
-                      <p className="text-white text-xs sm:text-sm md:text-base line-clamp-2 sm:line-clamp-2 md:line-clamp-3 mb-3 sm:mb-4 md:mb-5 shadow-text font-medium">
+                      <p className="text-white text-[10px] xs:text-xs sm:text-sm md:text-base line-clamp-2 sm:line-clamp-2 md:line-clamp-3 mb-2 sm:mb-3 md:mb-4 shadow-text font-medium">
                         {info?.content || movie.content || "Đang tải thông tin phim..."}
                       </p>
                       <Link href={`/phim/${movie.slug}`}>
-                        <button className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-4 py-2 sm:px-5 sm:py-2.5 md:px-7 md:py-3 rounded-full flex items-center gap-2 text-xs sm:text-sm md:text-base transition-all shadow-lg">
-                          <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                        <button className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-3 py-1.5 sm:px-4 sm:py-2 md:px-5 md:py-2.5 rounded-full flex items-center gap-1.5 text-xs sm:text-sm md:text-base transition-all shadow-lg">
+                          <Play className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
                           <span className="font-bold">Xem Phim</span>
                         </button>
                       </Link>
@@ -335,14 +382,12 @@ export const MovieSlider = memo(({ movies }: MovieSliderProps) => {
           );
         })}
       </Swiper>
-      <div 
-        className="absolute bottom-4 sm:bottom-6 md:bottom-8 lg:bottom-10 z-10 flex flex-row items-center justify-center gap-1 sm:gap-1.5 md:gap-2 bg-black/30 backdrop-blur-sm px-2 py-1.5 sm:px-3 sm:py-2 rounded-full w-fit mx-auto left-1/2 -translate-x-1/2"
-      >
+      <div className="thumbnail-container">
         {visibleMovies.map((movie, i) => (
           <button
             key={movie._id}
-            className={`group relative w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 border-2 ${
-              activeIndex === i ? 'border-yellow-500' : 'border-transparent'
+            className={`group relative w-5 h-5 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 border-2 ${
+              activeIndex === i ? 'border-yellow-500 scale-110 z-10' : 'border-transparent'
             } rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:border-white hover:scale-105 focus:outline-none`}
             onClick={() => handleSlideClick(i)}
           >
@@ -352,7 +397,7 @@ export const MovieSlider = memo(({ movies }: MovieSliderProps) => {
                 alt={movie.name} 
                 className="object-cover"
                 fill
-                sizes="(max-width: 640px) 32px, (max-width: 768px) 48px, (max-width: 1024px) 64px, 64px"
+                sizes="(max-width: 640px) 20px, (max-width: 768px) 32px, (max-width: 1024px) 40px, (max-width: 1280px) 48px, 48px"
                 quality={60}
                 placeholder="blur"
                 blurDataURL={getImagePlaceholder('poster')}

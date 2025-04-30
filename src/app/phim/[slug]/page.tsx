@@ -160,133 +160,109 @@ export default function MovieDetail() {
         <div className="absolute inset-0 hero-side-overlay z-[1]" />
         
         {/* Movie Info Container */}
-        <div className="absolute bottom-0 left-0 w-full z-[5]">
-          <div className="container mx-auto px-4 pb-8 sm:pb-10 md:pb-14 lg:pb-20">
-            <div className="max-w-3xl text-white">
-              {/* Movie Title */}
-              <h1 className="font-bold mb-2 text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white movie-title">
-                {movie?.name}
-              </h1>
-              
-              {/* Original Title if different */}
-              {movie?.origin_name && movie.origin_name !== movie.name && (
-                <h3 className="text-sm sm:text-base text-white/80 mb-2 line-clamp-1 shadow-text">
-                  {movie.origin_name}
-                </h3>
-              )}
-              
-              {/* Movie Badges/Tags */}
-              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 md:gap-3 mb-3 text-xs sm:text-xs md:text-sm">
-                {getImdbRating(movie.imdb) !== '' && (
-                  <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-yellow-500 rounded text-black font-bold">
-                    IMDb {getImdbRating(movie.imdb)}
-                  </span>
-                )}
-                {movie?.time && (
-                  <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
-                    {movie.time}
-                  </span>
-                )}
-                {movie?.quality && (
-                  <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
-                    {movie.quality}
-                  </span>
-                )}
-                {movie?.episode_current && (
-                  <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-red-500/90 backdrop-blur-sm rounded font-medium text-white">
-                    {movie.episode_current}
-                  </span>
-                )}
-                <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
-                  {movie?.lang || 'Vietsub'}
-                </span>
-                <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
-                  {movie?.year || '2025'}
-                </span>
+        <div className="absolute bottom-0 left-0 w-full z-[5] pb-10">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-row items-end gap-6">
+              <div className="hidden sm:block w-[140px] md:w-[180px]">
+                <img 
+                  src={poster || '/images/placeholder-poster.jpg'} 
+                  alt={movie?.name} 
+                  className="w-full h-auto rounded-lg shadow-lg" 
+                  loading="eager" 
+                />
               </div>
-              
-              {/* Categories */}
-              {movie.category && movie.category.length > 0 ? (
-                <div className="flex flex-wrap gap-1.5 sm:gap-2 md:gap-3 text-white text-xs sm:text-xs md:text-sm mb-3">
-                  {movie.category.map((cat, i) => (
-                    <span key={i} className="category-item px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
-                      {cat.name}
+              <div className="flex-1 text-white max-w-3xl">
+                {/* Movie Title */}
+                <h1 className="font-bold mb-2 text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white movie-title">
+                  {movie?.name}
+                </h1>
+                
+                {/* Original Title if different */}
+                {movie?.origin_name && movie.origin_name !== movie.name && (
+                  <h3 className="text-sm sm:text-base text-white/80 mb-2 line-clamp-1 shadow-text">
+                    {movie.origin_name}
+                  </h3>
+                )}
+                
+                {/* Movie Badges/Tags */}
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 md:gap-3 mb-3 text-xs sm:text-xs md:text-sm">
+                  {getImdbRating(movie.imdb) !== '' && (
+                    <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-yellow-500 rounded text-black font-bold">
+                      IMDb {getImdbRating(movie.imdb)}
                     </span>
-                  ))}
+                  )}
+                  {movie?.time && (
+                    <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
+                      {movie.time}
+                    </span>
+                  )}
+                  {movie?.quality && (
+                    <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
+                      {movie.quality}
+                    </span>
+                  )}
+                  {movie?.episode_current && (
+                    <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-red-500/90 backdrop-blur-sm rounded font-medium text-white">
+                      {movie.episode_current}
+                    </span>
+                  )}
+                  <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
+                    {movie?.lang || 'Vietsub'}
+                  </span>
+                  <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
+                    {movie?.year || '2025'}
+                  </span>
                 </div>
-              ) : null}
-              
-              {/* Movie Description */}
-              <p className="text-white text-xs sm:text-sm md:text-base line-clamp-2 sm:line-clamp-2 md:line-clamp-3 mb-3 sm:mb-4 md:mb-5 shadow-text font-medium">
-                {movie?.content || "Chưa có thông tin mô tả."}
-              </p>
-              
-              {/* Watch Button */}
-              {episodes[0]?.server_data?.[0]?.slug && (
-                <button
-                  onClick={() => {
-                    // Xác định đúng loại server cho tập đầu tiên
-                    const firstServer = episodes[0];
-                    const serverName = firstServer.server_name.toLowerCase();
-                    let serverType = 'vietsub';
-                    
-                    if (serverName.includes('vietsub')) {
-                      serverType = 'vietsub';
-                    } else if (serverName.includes('thuyet minh')) {
-                      serverType = 'thuyet-minh';
-                    } else if (serverName.includes('long tieng') || serverName.includes('lồng tiếng')) {
-                      serverType = 'long-tieng';
-                    }
-                    
-                    handleEpisodeClick(serverType, firstServer.server_data[0].slug);
-                  }}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-4 py-2 sm:px-5 sm:py-2.5 md:px-7 md:py-3 rounded-full flex items-center gap-2 text-xs sm:text-sm md:text-base transition-all shadow-lg"
-                >
-                  <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-                  <span className="font-bold">Xem Phim</span>
-                </button>
-              )}
+                
+                {/* Categories */}
+                {movie.category && movie.category.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2 md:gap-3 text-white text-xs sm:text-xs md:text-sm mb-3">
+                    {movie.category.map((cat, i) => (
+                      <span key={i} className="category-item px-1.5 py-0.5 sm:px-2 sm:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
+                        {cat.name}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+                
+                {/* Movie Description */}
+                <p className="text-white text-xs sm:text-sm md:text-base line-clamp-2 sm:line-clamp-2 md:line-clamp-3 mb-3 sm:mb-4 md:mb-5 shadow-text font-medium">
+                  {movie?.content || "Chưa có thông tin mô tả."}
+                </p>
+                
+                {/* Watch Button */}
+                {episodes[0]?.server_data?.[0]?.slug && (
+                  <button
+                    onClick={() => {
+                      // Xác định đúng loại server cho tập đầu tiên
+                      const firstServer = episodes[0];
+                      const serverName = firstServer.server_name.toLowerCase();
+                      let serverType = 'vietsub';
+                      
+                      if (serverName.includes('vietsub')) {
+                        serverType = 'vietsub';
+                      } else if (serverName.includes('thuyet minh')) {
+                        serverType = 'thuyet-minh';
+                      } else if (serverName.includes('long tieng') || serverName.includes('lồng tiếng')) {
+                        serverType = 'long-tieng';
+                      }
+                      
+                      handleEpisodeClick(serverType, firstServer.server_data[0].slug);
+                    }}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-4 py-2 sm:px-5 sm:py-2.5 md:px-7 md:py-3 rounded-full flex items-center gap-2 text-xs sm:text-sm md:text-base transition-all shadow-lg"
+                  >
+                    <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                    <span className="font-bold">Xem Phim</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Content Section */}
-      <div className="max-w-screen-xl mx-auto px-4 md:px-12 lg:px-20 py-6 sm:py-8 md:py-12">
-        {/* Movie Details */}
-        <div className="bg-[#1a1b1d]/95 backdrop-blur-md rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 mb-8 shadow-xl">
-          <div className="flex flex-row gap-4 sm:gap-6 md:gap-8">
-            <div className="w-1/3 sm:w-1/4 md:w-1/5 flex items-start justify-center">
-              <img 
-                src={poster || '/images/placeholder-poster.jpg'} 
-                alt={movie?.name} 
-                className="w-full h-auto rounded-lg sm:rounded-xl shadow-lg" 
-                loading="eager" 
-              />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-3">Thông tin phim</h2>
-              <div className="space-y-2 text-sm sm:text-base">
-                <p><span className="text-gray-400">Tên phim:</span> {movie.name}</p>
-                {movie.origin_name && movie.origin_name !== movie.name && (
-                  <p><span className="text-gray-400">Tên gốc:</span> {movie.origin_name}</p>
-                )}
-                <p><span className="text-gray-400">Trạng thái:</span> {movie.episode_current || 'Đang cập nhật'}</p>
-                <p><span className="text-gray-400">Thời lượng:</span> {movie.time || 'Chưa rõ'}</p>
-                <p><span className="text-gray-400">Năm sản xuất:</span> {movie.year || 'Chưa rõ'}</p>
-                <p><span className="text-gray-400">Chất lượng:</span> {movie.quality || 'HD'}</p>
-                <p><span className="text-gray-400">Ngôn ngữ:</span> {movie.lang || 'Vietsub'}</p>
-                {movie.category && movie.category.length > 0 && (
-                  <p>
-                    <span className="text-gray-400">Thể loại:</span>{' '}
-                    {movie.category.map(cat => cat.name).join(', ')}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
+      <div className="max-w-screen-xl mx-auto px-4 md:px-8 lg:px-12 py-6 sm:py-8 md:py-12">
         {/* Tab Navigation */}
         <div className="flex overflow-x-auto pb-2 md:pb-0 gap-2 sm:gap-4 mb-6 sm:mb-8 border-b border-gray-800 hide-scrollbar">
           <button
@@ -483,4 +459,4 @@ export default function MovieDetail() {
       </div>
     </div>
   );
-} 
+}

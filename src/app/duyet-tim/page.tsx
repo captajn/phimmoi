@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
@@ -21,6 +21,14 @@ interface MovieItem {
 }
 
 export default function Browse() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-8 pt-[72px] text-white">Đang tải...</div>}>
+      <BrowseContent />
+    </Suspense>
+  );
+}
+
+function BrowseContent() {
   const searchParams = useSearchParams();
   const [showFilters, setShowFilters] = useState(true);
   const [categories, setCategories] = useState<{ name: string; slug: string }[]>([]);

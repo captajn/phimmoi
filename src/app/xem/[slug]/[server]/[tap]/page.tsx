@@ -11,6 +11,7 @@ import { setupImageLazyLoading } from '@/utils/image'
 import { useParams } from 'next/navigation'
 import type { MovieEpisodeResponse } from '@/types/types'
 import React from 'react'
+import { Play } from 'lucide-react'
 
 // Định nghĩa kiểu cho dữ liệu từ API
 interface MovieEpisodeData {
@@ -242,7 +243,6 @@ export default function WatchDetail() {
           },
           icons: {
             loading: '<img src="/loading.gif">',
-            state: '<img src="/state.gif">',
           }
         })
 
@@ -404,7 +404,7 @@ export default function WatchDetail() {
 
   return (
     <div className="bg-[#0b0c0f] text-white min-h-screen">
-      <div className="max-w-screen-xl mx-auto">
+      <div className="max-w-screen-xl mx-auto pt-16">
         <div className="px-4 py-2 text-sm md:text-base">
           <Link href={`/phim/${slug}`} className="text-yellow-500 hover:underline">
             {movie?.name}
@@ -423,6 +423,7 @@ export default function WatchDetail() {
               </div>
             </div>
           )}
+          
           {videoLoadError && !isVideoLoading && (
             <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 z-10">
               <div className="text-center p-4">
@@ -434,13 +435,28 @@ export default function WatchDetail() {
                 <p className="text-white mb-4">Không thể tải video. Vui lòng thử lại.</p>
                 <button 
                   onClick={reloadVideo}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition duration-300"
+                  className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold rounded flex items-center gap-2 mx-auto transition"
                 >
-                  Tải lại video
+                  <Play className="w-4 h-4" />
+                  <span>Tải lại video</span>
                 </button>
               </div>
             </div>
           )}
+          
+          {/* Nút play ở giữa màn hình */}
+          {!isVideoLoading && !videoLoadError && (
+            <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+              <button 
+                onClick={reloadVideo}
+                className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center bg-yellow-500 hover:bg-yellow-600 text-black rounded-full transition-all transform hover:scale-110 shadow-lg pointer-events-auto"
+                aria-label="Phát video"
+              >
+                <Play className="w-8 h-8 sm:w-10 sm:h-10" />
+              </button>
+            </div>
+          )}
+          
           <div ref={playerRef} className="w-full h-full"></div>
           </div>
 
@@ -465,14 +481,14 @@ export default function WatchDetail() {
               <div className="flex items-center">
                 <button
                   className={`flex items-center px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm rounded-md transition-colors ${
-                    autoNext ? 'text-white bg-red-600' : 'text-gray-400 hover:bg-[#2a2b2d]'
+                    autoNext ? 'text-black bg-yellow-500' : 'text-gray-400 hover:bg-[#2a2b2d]'
                   }`}
                   onClick={() => setAutoNext(!autoNext)}
                   title="Tự động chuyển tập và phát khi video kết thúc"
                 >
                   <span className="inline mr-1">Chuyển tập</span>
                   <span className={`px-1.5 py-0.5 text-xs rounded-sm ${
-                    autoNext ? 'bg-white text-red-600' : 'bg-gray-700 text-white'
+                    autoNext ? 'bg-white text-black' : 'bg-gray-700 text-white'
                   }`}>
                     {autoNext ? 'ON' : 'OFF'}
                   </span>
@@ -482,14 +498,14 @@ export default function WatchDetail() {
               <div className="flex items-center">
                 <button
                   className={`flex items-center px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm rounded-md transition-colors ${
-                    theaterMode ? 'text-white bg-red-600' : 'text-gray-400 hover:bg-[#2a2b2d]'
+                    theaterMode ? 'text-black bg-yellow-500' : 'text-gray-400 hover:bg-[#2a2b2d]'
                   }`}
                   onClick={() => setTheaterMode(!theaterMode)}
                   title="Chế độ rạp phim, ẩn tất cả các menu và nội dung khác"
                 >
                   <span className="inline mr-1">Rạp phim</span>
                   <span className={`px-1.5 py-0.5 text-xs rounded-sm ${
-                    theaterMode ? 'bg-white text-red-600' : 'bg-gray-700 text-white'
+                    theaterMode ? 'bg-white text-black' : 'bg-gray-700 text-white'
                   }`}>
                     {theaterMode ? 'ON' : 'OFF'}
                   </span>

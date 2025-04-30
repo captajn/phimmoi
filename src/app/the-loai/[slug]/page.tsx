@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { Suspense, useState, use } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { api } from '@/services/api'
@@ -8,14 +8,10 @@ import { MovieCard } from '@/components/MovieCard'
 import { MovieCardGridSkeleton } from '@/components/Skeleton'
 import type { Movie } from '@/types/movie'
 
-interface PageProps {
-  params: {
-    slug: string
-  }
-}
+export const dynamic = 'force-dynamic'
 
-export default function CategoryPage({ params }: PageProps) {
-  const { slug } = params
+export default function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params)
   
   return (
     <Suspense fallback={<MovieCardGridSkeleton />}>
