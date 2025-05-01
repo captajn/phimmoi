@@ -1,5 +1,5 @@
-export const runtime = 'edge'
-export const revalidate = 3600 // revalidate every hour
+// export const runtime = 'edge'
+export const revalidate = 60 // revalidate mỗi phút thay vì mỗi giờ
 
 import { Suspense } from 'react'
 import { MovieSlider } from '@/components/MovieSlider'
@@ -15,22 +15,57 @@ import { getMovies } from '@/services/movies'
 
 async function getInitialMovies() {
   try {
-    const data = await getMovies('phim-moi-cap-nhat-v3', { page: 1 })
-    return data
+    // Không sử dụng AbortController vì có thể không tương thích với ISR
+    const data = await getMovies('phim-moi-cap-nhat-v3', { page: 1 });
+    
+    // Kiểm tra dữ liệu trả về có hợp lệ hay không
+    if (!data || !data.items || !Array.isArray(data.items) || data.items.length === 0) {
+      console.warn('API không trả về dữ liệu phim hợp lệ');
+      return { 
+        items: [], 
+        totalItems: 0, 
+        currentPage: 1, 
+        totalPages: 0 
+      };
+    }
+    
+    return data;
   } catch (error) {
     console.error('Error fetching initial movies:', error)
-    return { items: [] }
+    // Trả về mảng rỗng nhưng có cấu trúc đúng để component không bị lỗi
+    return { 
+      items: [], 
+      totalItems: 0, 
+      currentPage: 1, 
+      totalPages: 0 
+    };
   }
 }
 
 export default async function Home() {
   const initialMovies = await getInitialMovies()
+  const hasMovies = initialMovies.items && initialMovies.items.length > 0;
 
   return (
     <div className="w-full min-h-screen text-white">
       <div className="w-full">
         <Suspense fallback={<MovieSliderSkeleton />}>
-          <MovieSlider movies={initialMovies.items} />
+          {hasMovies ? (
+            <MovieSlider movies={initialMovies.items} />
+          ) : (
+            <div className="w-full h-[50vh] sm:h-[60vh] md:h-[65vh] bg-gray-900 flex items-center justify-center">
+              <div className="text-center p-4">
+                <h2 className="text-2xl font-bold text-yellow-400 mb-4">Đang tải dữ liệu phim</h2>
+                <p className="text-gray-400 mb-6">Hệ thống đang xử lý dữ liệu phim, vui lòng đợi trong giây lát</p>
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                >
+                  Tải lại trang
+                </button>
+              </div>
+            </div>
+          )}
         </Suspense>
       </div>
 

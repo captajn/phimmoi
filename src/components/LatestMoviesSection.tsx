@@ -10,10 +10,12 @@ import { preloadPriorityImages, preloadImage, getOptimizedImageUrl } from '../ut
 export const LatestMoviesSection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { data } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['latestMovies'],
     queryFn: () => api.getLatestMovies(1),
     staleTime: 5 * 60 * 1000,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 
   // Sử dụng useMemo để tránh tạo mảng mới mỗi lần render
@@ -25,6 +27,7 @@ export const LatestMoviesSection = () => {
       queryKey: ['movie', movie.slug],
       queryFn: () => api.getMovieDetail(movie.slug),
       staleTime: 5 * 60 * 1000,
+      retry: 2,
     })),
   });
 
@@ -56,6 +59,52 @@ export const LatestMoviesSection = () => {
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
+
+  if (isLoading) {
+    return (
+      <section className="container mx-auto px-4 py-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-green-400">
+              Phim Mới Cập Nhật
+            </h2>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
+          {[...Array(12)].map((_, index) => (
+            <div key={index} className="animate-pulse">
+              <div className="aspect-[3/4] bg-gray-800 rounded-lg mb-2"></div>
+              <div className="h-4 bg-gray-800 rounded w-3/4 mb-1"></div>
+              <div className="h-3 bg-gray-800 rounded w-1/2"></div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (isError || !movies.length) {
+    return (
+      <section className="container mx-auto px-4 py-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-green-400">
+              Phim Mới Cập Nhật
+            </h2>
+          </div>
+        </div>
+        <div className="bg-gray-800/30 rounded-xl p-10 text-center">
+          <p className="text-gray-400">Đang tải dữ liệu phim. Vui lòng thử lại sau.</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+          >
+            Tải lại trang
+          </button>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="container mx-auto px-4 py-6">

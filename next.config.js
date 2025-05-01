@@ -1,15 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'phimapi.com'
-      },
-      {
-        protocol: 'https',
-        hostname: 'img.phimapi.com'
       },
       {
         protocol: 'https',
@@ -20,20 +17,23 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   compress: true,
+  poweredByHeader: false,
+  reactStrictMode: false,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3000', 'localhost:3001', 'phim.chjbi.net'],
+      allowedOrigins: ['localhost:3001', 'phim.chjbi.net', '127.0.0.1:3001'],
       bodySizeLimit: '2mb'
     }
   },
-  assetPrefix: process.env.NODE_ENV === 'production' ? './' : '',
   pageExtensions: ['tsx', 'ts', 'jsx', 'js', 'mdx'],
   onDemandEntries: {
     maxInactiveAge: 60 * 60 * 1000,
     pagesBufferLength: 5,
   },
   webpack: (config) => {
-    // Chúng ta có thể thêm các quy tắc loại trừ thư mục pages ở đây nếu cần
     return config;
   },
   async headers() {
@@ -43,27 +43,19 @@ const nextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=3600, stale-while-revalidate=3600',
+            value: 'public, max-age=60, stale-while-revalidate=300',
           },
         ],
       },
     ]
   },
   async rewrites() {
-    return {
-      beforeFiles: [
-        {
-          source: '/:path*',
-          has: [
-            {
-              type: 'host',
-              value: 'phim.chjbi.net',
-            },
-          ],
-          destination: '/:path*',
-        },
-      ],
-    }
+    return [
+      {
+        source: '/:path*',
+        destination: '/:path*',
+      },
+    ]
   },
 }
 

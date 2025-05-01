@@ -1,26 +1,18 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export const config = {
-  matcher: [
-    '/',
-    '/phim/:path*',
-    '/xem/:path*',
-    '/api/:path*',
-    '/the-loai/:path*',
-    '/quoc-gia/:path*',
-    '/tim-kiem',
-    '/duyet-tim',
-  ],
-}
-
 export function middleware(request: NextRequest) {
+  // Tạo response
   const response = NextResponse.next()
+  
+  // Lấy thông tin hostname và đường dẫn
+  const url = request.nextUrl.clone()
+  const { pathname } = url
   const host = request.headers.get('host') || ''
   const isCustomDomain = host.includes('phim.chjbi.net')
-
+  
   // Cấu hình cache cho trang chủ và trang chi tiết phim
-  if (request.nextUrl.pathname === '/' || request.nextUrl.pathname.startsWith('/phim/')) {
+  if (pathname === '/' || pathname.startsWith('/phim/')) {
     response.headers.set(
       'Cache-Control',
       'public, s-maxage=3600, stale-while-revalidate=3600'
@@ -28,7 +20,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Cấu hình cache cho API endpoints
-  if (request.nextUrl.pathname.startsWith('/api/')) {
+  if (pathname.startsWith('/api/')) {
     response.headers.set(
       'Cache-Control',
       'public, s-maxage=60, stale-while-revalidate=300'
@@ -53,4 +45,17 @@ export function middleware(request: NextRequest) {
   }
 
   return response
+}
+
+// Chỉ áp dụng middleware cho các đường dẫn cần xử lý
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
 } 

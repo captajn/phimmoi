@@ -1,11 +1,20 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { MovieResponse } from '../types/movie';
 import { MovieEpisodeResponse } from '../types/types';
 
+// Mở rộng interface AxiosRequestConfig để thêm các thuộc tính tùy chỉnh
+declare module 'axios' {
+  interface AxiosRequestConfig {
+    retry?: number;
+    retryDelay?: number;
+    _retryCount?: number;
+  }
+}
+
 const BASE_URL = 'https://phimapi.com';
 
-const DEFAULT_STALE_TIME = 5 * 60 * 1000;
-const DEFAULT_CACHE_TIME = 30 * 60 * 1000;
+const DEFAULT_STALE_TIME = 1 * 60 * 1000;
+const DEFAULT_CACHE_TIME = 5 * 60 * 1000;
 
 interface FilterParams {
   page?: number;                  // Số trang cần truy xuất, sử dụng [totalPages] để biết tổng trang khả dụng
@@ -44,7 +53,7 @@ interface CacheItem {
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000,
+  timeout: 8000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -52,24 +61,34 @@ const apiClient = axios.create({
 
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    console.error('API Error:', error.response?.data || error.message);
-    return Promise.reject(error);
+  async (error) => {
+    const { config } = error;
+    
+    if (!config || !config.retry || config._retryCount >= config.retry) {
+      console.error('API Error after retries:', error.response?.data || error.message);
+      return Promise.reject(error);
+    }
+    
+    config._retryCount = config._retryCount || 0;
+    config._retryCount += 1;
+    
+    console.log(`Retrying API request (${config._retryCount}/${config.retry}): ${config.url}`);
+    
+    const delay = config.retryDelay || 1000;
+    await new Promise(resolve => setTimeout(resolve, delay));
+    
+    return apiClient(config);
   }
 );
 
-// Thời gian cache (5 phút)
-const CACHE_TTL = 5 * 60 * 1000;
+const CACHE_TTL = 1 * 60 * 1000;
 
-// Cache cho từng loại request
 const cacheStore: Record<string, CacheItem> = {};
 
-// Hàm tạo khóa cache từ URL và tham số
 const createCacheKey = (endpoint: string, params: any = {}): string => {
   return `${endpoint}:${JSON.stringify(params)}`;
 };
 
-// Hàm kiểm tra và lấy từ cache
 const getFromCache = (key: string): any | null => {
   const now = Date.now();
   const cachedItem = cacheStore[key];
@@ -82,7 +101,6 @@ const getFromCache = (key: string): any | null => {
   return null;
 };
 
-// Hàm lưu vào cache
 const saveToCache = (key: string, data: any): void => {
   cacheStore[key] = {
     data,
@@ -90,13 +108,19 @@ const saveToCache = (key: string, data: any): void => {
   };
 };
 
-// Cache cũ (để duy trì khả năng tương thích)
 let latestMoviesCache: { data: MovieResponse | null, timestamp: number } = { 
   data: null, 
   timestamp: 0 
 };
 
-// Hàm chuẩn hóa text để dễ dàng so sánh
+// Sửa phần code trả về dữ liệu rỗng để tương thích với kiểu MovieResponse
+const emptyMovieResponse: MovieResponse = {
+  items: [],
+  totalItems: 0,
+  totalPages: 0,
+  currentPage: 1
+};
+
 function normalizeText(text: string): string {
   if (!text) return '';
   return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -112,7 +136,9 @@ const api = {
 
       console.log('Fetch dữ liệu mới từ API: latest movies');
       const response = await apiClient.get('/danh-sach/phim-moi-cap-nhat-v3', {
-        params: { page }
+        params: { page },
+        retry: 3, // Thử lại tối đa 3 lần
+        retryDelay: 1000 // Delay 1s giữa các lần thử
       });
       
       // Lưu vào cache mới
@@ -132,7 +158,8 @@ const api = {
         console.log('Sử dụng cache cũ do API lỗi');
         return latestMoviesCache.data;
       }
-      throw err;
+      // Nếu không có cache, trả về một đối tượng rỗng nhưng hợp lệ
+      return emptyMovieResponse;
     }
   },
 
@@ -170,7 +197,6 @@ const api = {
   },
 
   getMoviesByType: async (type: string, page: number = 1, params: FilterParams = {}) => {
-    // type_list có thể là: phim-bo, phim-le, tv-shows, hoat-hinh, phim-vietsub, phim-thuyet-minh, phim-long-tieng
     try {
       const allParams = { page, ...params };
       const cacheKey = createCacheKey(`/v1/api/danh-sach/${type}`, allParams);
@@ -284,7 +310,6 @@ const api = {
 
   getSeriesMovies: async (page: number = 1, limit: number = 12) => {
     try {
-      // Sử dụng endpoint /v1/api/danh-sach/phim-bo để lấy danh sách phim bộ
       const response = await apiClient.get('/v1/api/danh-sach/phim-bo', {
         params: {
           page,
@@ -314,33 +339,27 @@ const api = {
 
   getMovieEpisode: async (slug: string, server: string, tap: string): Promise<MovieEpisodeResponse> => {
     try {
-      // Lấy thông tin chi tiết phim
       const movieDetail = await api.getMovieDetail(slug);
       const episodes = movieDetail.episodes || [];
       
-      // Map các slug server có thể đến các tên server thực tế
       const serverMap: Record<string, string> = {
         'vietsub': 'VietSub',
         'thuyet-minh': 'Thuyết Minh',
         'long-tieng': 'Lồng Tiếng'
       };
       
-      // Tìm server tương ứng
       let serverName = serverMap[server] || server;
       let serverData = episodes.find((e: any) => 
         normalizeText(e.server_name).includes(normalizeText(serverName))
       );
       
-      // Nếu không tìm thấy server, thử tìm server phù hợp với loại phim
       if (!serverData) {
-        // Nếu tìm thuyết minh mà không có, thử sử dụng lồng tiếng
         if (server === 'thuyet-minh') {
           serverData = episodes.find((e: any) => 
             e.server_name.toLowerCase().includes('lồng tiếng') || 
             e.server_name.toLowerCase().includes('long tieng')
           );
         }
-        // Nếu không tìm thấy, lấy server đầu tiên
         if (!serverData && episodes.length > 0) {
           serverData = episodes[0];
         }
@@ -350,7 +369,6 @@ const api = {
         throw new Error(`Không tìm thấy server ${server}`);
       }
       
-      // Tìm tập phim
       const episode = serverData.server_data.find((e: any) => e.slug === tap);
       
       if (!episode) {

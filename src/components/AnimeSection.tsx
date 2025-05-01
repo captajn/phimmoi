@@ -148,8 +148,8 @@ export const AnimeSection: React.FC = () => {
         </div>
       </Link>
 
-      <div className="relative">
-        <div className="rounded-lg sm:rounded-xl md:rounded-xl overflow-hidden relative h-[250px] sm:h-[300px] md:h-[400px] lg:h-[450px]">
+      <div className="relative w-full">
+        <div className="rounded-lg sm:rounded-xl md:rounded-xl overflow-hidden relative h-[250px] sm:h-[300px] md:h-[400px] lg:h-[450px] w-full">
           <div className="absolute inset-0">
             <img 
               src={getImageUrl(mainMovie.thumb_url)} 
@@ -159,7 +159,7 @@ export const AnimeSection: React.FC = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
           </div>
 
-          <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 lg:bottom-10 left-0 p-3 sm:p-4 md:p-6 w-full md:w-2/3">
+          <div className="absolute bottom-20 sm:bottom-16 md:bottom-16 lg:bottom-16 left-0 p-3 sm:p-4 md:p-6 w-full md:w-2/3">
             <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1.5 sm:mb-2 text-white line-clamp-1 sm:line-clamp-2">
               {mainMovie.name}
             </h3>
@@ -194,33 +194,36 @@ export const AnimeSection: React.FC = () => {
               <span className="text-xs sm:text-sm md:text-base">Xem phim</span>
             </Link>
           </div>
-        </div>
-
-        <div className="absolute -bottom-3 sm:-bottom-4 md:-bottom-5 left-0 right-0 flex justify-center">
-          <div 
-            ref={scrollRef}
-            className="flex gap-1 sm:gap-1.5 md:gap-2 overflow-x-auto pb-2 px-2 max-w-full [&::-webkit-scrollbar]:hidden scrollbar-hide"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {otherMovies.map((movie: Movie, index: number) => (
-              <button
-                key={movie._id}
-                onClick={() => setActiveMovie(index)}
-                className={`relative w-[36px] sm:w-[45px] md:w-[55px] flex-shrink-0 aspect-[3/4] rounded-md overflow-hidden border-2 transition-all ${
-                  index === activeMovie ? 'border-yellow-400 scale-110 z-10' : 'border-transparent hover:border-white/50'
-                }`}
-              >
-                <img
-                  src={getImageUrl(movie.poster_url)}
-                  alt={movie.name}
-                  className="w-full h-full object-cover"
-                  loading={index < 6 ? "eager" : "lazy"}
-                />
-                <div className={`absolute inset-0 bg-black/50 transition-opacity ${
-                  index === activeMovie ? 'opacity-0' : 'opacity-40'
-                }`} />
-              </button>
-            ))}
+          
+          {/* Thumbnails with different positioning for mobile and desktop */}
+          <div className="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-sm py-2 z-10 
+            sm:bg-transparent sm:backdrop-blur-none sm:bottom-2 sm:py-0 md:bottom-3 lg:bottom-4">
+            <div 
+              ref={scrollRef}
+              className="flex gap-1 sm:gap-1.5 md:gap-2 overflow-x-auto px-2 max-w-full [&::-webkit-scrollbar]:hidden scrollbar-hide
+                sm:justify-center"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {otherMovies.map((movie: Movie, index: number) => (
+                <button
+                  key={movie._id}
+                  onClick={() => setActiveMovie(index)}
+                  className={`relative w-[36px] sm:w-[45px] md:w-[55px] flex-shrink-0 aspect-[3/4] rounded-md overflow-hidden border-2 transition-all ${
+                    index === activeMovie ? 'border-yellow-400 scale-110 z-10' : 'border-transparent hover:border-white/50'
+                  }`}
+                >
+                  <img
+                    src={getImageUrl(movie.poster_url)}
+                    alt={movie.name}
+                    className="w-full h-full object-cover"
+                    loading={index < 6 ? "eager" : "lazy"}
+                  />
+                  <div className={`absolute inset-0 bg-black/50 transition-opacity ${
+                    index === activeMovie ? 'opacity-0' : 'opacity-40'
+                  }`} />
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>

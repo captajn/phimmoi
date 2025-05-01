@@ -9,19 +9,13 @@ interface Movie {
   episode_current?: string
 }
 
-interface MovieResponse {
-  items: Movie[]
-  total: number
-  page: number
-  pages: number
-}
-
 interface MovieParams {
   page?: number
   limit?: number
 }
 
-export async function getMovies(type: string, params: MovieParams = {}): Promise<MovieResponse> {
+// Sửa lại MovieResponse để tương thích với định nghĩa từ types/movie.ts
+export async function getMovies(type: string, params: MovieParams = {}) {
   const searchParams = new URLSearchParams()
   if (params.page) searchParams.set('page', params.page.toString())
   if (params.limit) searchParams.set('limit', params.limit.toString())
@@ -32,12 +26,11 @@ export async function getMovies(type: string, params: MovieParams = {}): Promise
   
   try {
     const res = await fetch(url, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 60 }, // Giảm thời gian revalidate xuống để thử nghiệm
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=3600'
       },
-      cache: 'force-cache'
+      // Để Next.js tự xử lý việc caching và stale-while-revalidate
     })
     
     if (!res.ok) {
@@ -57,17 +50,17 @@ export async function getMovies(type: string, params: MovieParams = {}): Promise
         thumb_url: item.thumb_url || '',
         poster_url: item.poster_url || ''
       })),
-      total: data.total || 0,
-      page: data.page || 1,
-      pages: data.pages || 0
+      totalItems: data.total || 0,
+      currentPage: data.page || 1,
+      totalPages: data.pages || 0
     }
   } catch (error) {
     console.error('Error fetching movies:', error)
     return {
       items: [],
-      total: 0,
-      page: 1,
-      pages: 0
+      totalItems: 0,
+      currentPage: 1,
+      totalPages: 0
     }
   }
 } 

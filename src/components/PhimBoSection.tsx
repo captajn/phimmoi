@@ -260,9 +260,9 @@ export const PhimBoSection: React.FC<PhimBoSectionProps> = ({
         </div>
       </div>
 
-      <div className="flex justify-center mt-3 sm:mt-4" style={{ opacity: isClient && movies.length > 1 ? 1 : 0 }}>
-        <div className="overflow-x-auto no-scrollbar">
-          <div className="flex gap-1.5 sm:gap-2">
+      <div className="hidden sm:flex justify-center mt-3 sm:mt-4" style={{ opacity: isClient && movies.length > 1 ? 1 : 0 }}>
+        <div className="flex justify-center items-center w-full">
+          <div className="flex gap-1.5 sm:gap-2 flex-wrap max-w-full">
             {movies.map((m: Movie, idx: number) => (
               <div
                 key={m.slug || idx}

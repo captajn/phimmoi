@@ -205,87 +205,390 @@ export const MovieSlider = memo(({ movies }: MovieSliderProps) => {
   return (
     <div className="relative w-full overflow-hidden">
       <style jsx global>{`
-        .shadow-text {
-          text-shadow: 0 2px 4px rgba(0,0,0,0.9);
-        }
-        .movie-title {
-          text-shadow: 0 4px 8px rgba(0,0,0,1);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 100%;
-        }
-        .slider-overlay {
-          background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 35%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0) 100%);
-        }
-        .slider-side-overlay {
-          background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 25%, rgba(0,0,0,0) 75%);
-        }
-        @media (min-width: 1024px) {
-          .slider-overlay {
-            background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 35%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 100%);
-          }
-          .slider-side-overlay {
-            background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 25%, rgba(0,0,0,0) 85%);
-          }
-        }
-        .category-item {
-          display: inline-block;
-        }
-        @media (max-width: 767px) {
-          .category-item:nth-child(n+4) {
-            display: none;
-          }
-        }
-        @media (min-width: 768px) and (max-width: 1023px) {
-          .category-item:nth-child(n+5) {
-            display: none;
-          }
-        }
-        .thumbnail-container {
-          position: absolute;
-          z-index: 10;
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          justify-content: center;
-          gap: 0.25rem;
-          background-color: rgba(0, 0, 0, 0.3);
-          backdrop-filter: blur(4px);
-          padding: 0.375rem 0.5rem;
-          border-radius: 9999px;
-          width: fit-content;
-          margin-left: auto;
-          margin-right: auto;
-          left: 50%;
-          transform: translateX(-50%);
-        }
-        @media (max-width: 640px) {
-          .thumbnail-container {
-            bottom: 35%;
-          }
-        }
-        @media (min-width: 641px) and (max-width: 768px) {
-          .thumbnail-container {
-            bottom: 32%;
-          }
-        }
-        @media (min-width: 769px) and (max-width: 1024px) {
-          .thumbnail-container {
-            bottom: 30%;
-          }
-        }
-        @media (min-width: 1025px) and (max-width: 1280px) {
-          .thumbnail-container {
-            bottom: 28%;
-          }
-        }
-        @media (min-width: 1281px) {
-          .thumbnail-container {
-            bottom: 28%;
-          }
-        }
-      `}</style>
+  .shadow-text {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+  }
+  .movie-title {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 1);
+    font-size: 2.5rem;
+    line-height: 1.2;
+    font-weight: 800;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  .movie-origin-title {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1rem;
+  }
+  .slider-overlay {
+    background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.75) 0%,
+      rgba(0, 0, 0, 0.5) 30%,
+      rgba(0, 0, 0, 0.3) 60%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+  }
+  .slider-side-overlay {
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.6) 0%,
+      rgba(0, 0, 0, 0.4) 25%,
+      rgba(0, 0, 0, 0) 75%
+    );
+  }
+  @media (min-width: 1024px) {
+    .slider-overlay {
+      background: linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.7) 0%,
+        rgba(0, 0, 0, 0.4) 35%,
+        rgba(0, 0, 0, 0.2) 70%,
+        rgba(0, 0, 0, 0.05) 100%
+      );
+    }
+    .slider-side-overlay {
+      background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.6) 0%,
+        rgba(0, 0, 0, 0.4) 30%,
+        rgba(0, 0, 0, 0.1) 60%,
+        rgba(0, 0, 0, 0) 100%
+      );
+    }
+  }
+  .category-item {
+    display: inline-block;
+  }
+  @media (max-width: 767px) {
+    .category-item:nth-child(n + 4) {
+      display: none;
+    }
+  }
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .category-item:nth-child(n + 5) {
+      display: none;
+    }
+  }
+  /* Container chứa thông tin phim */
+  .movie-info-container {
+    position: relative;
+    z-index: 15;
+    width: 100%;
+    max-width: 800px;
+  }
+  
+  @media (max-width: 640px) {
+    .movie-info-container {
+      padding-bottom: 1rem;
+    }
+    .movie-title {
+      font-size: 1.75rem;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+    .movie-origin-title {
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
+    .movie-description {
+      max-height: 3rem;
+      overflow: hidden;
+      font-size: 0.875rem !important;
+      line-height: 1.3 !important;
+      margin-bottom: 1rem !important;
+    }
+    .movie-tag {
+      font-size: 0.65rem !important;
+      padding: 0.15rem 0.5rem !important;
+      margin-right: 0.35rem !important;
+      margin-bottom: 0.35rem !important;
+    }
+    .movie-genres {
+      margin: 0.5rem 0 !important;
+    }
+  }
+  
+  @media (min-width: 641px) {
+    .movie-info-container {
+      padding-bottom: 1.5rem;
+    }
+  }
+  
+  /* Thumbnail container */
+  .thumbnail-container {
+    position: absolute;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: fit-content;
+    margin-top: auto;
+    margin-bottom: auto;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 1rem;
+  }
+  
+  .thumbnail-button {
+    position: relative;
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    background-color: rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .thumbnail-button.active {
+    border-color: #fff;
+    transform: scale(1.2);
+  }
+  
+  .thumbnail-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  @media (max-width: 767px) {
+    .thumbnail-container {
+      right: 0.5rem;
+    }
+    
+    .thumbnail-button {
+      width: 2.5rem !important;
+      height: 2.5rem !important;
+      border-radius: 4px;
+      margin-bottom: 0.25rem;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .thumbnail-container {
+      flex-direction: row;
+      right: auto;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 1.5rem;
+      top: auto;
+    }
+    
+    .thumbnail-button {
+      width: 2rem !important;
+      height: 2rem !important;
+      margin-right: 0.35rem;
+      margin-bottom: 0;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .thumbnail-container {
+      bottom: 2rem;
+    }
+    
+    .thumbnail-button {
+      width: 2.5rem !important;
+      height: 2.5rem !important;
+      margin-right: 0.5rem;
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .thumbnail-container {
+      bottom: 3rem;
+    }
+  }
+  
+  /* Button Xem Phim */
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .watch-movie-button {
+    position: relative;
+    z-index: 16;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background-color: #ff9f0a;
+    color: #000;
+    font-weight: 700;
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+  }
+  
+  .watch-movie-button:hover {
+    background-color: #e89000;
+  }
+  
+  .add-list-button {
+    position: relative;
+    z-index: 16;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-weight: 600;
+    border-radius: 9999px;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+  }
+  
+  .add-list-button:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+
+  @media (max-width: 767px) {
+    .add-list-button {
+      display: none;
+    }
+    
+    .watch-movie-button {
+      width: 100%;
+      justify-content: center;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+    
+    .action-buttons {
+      margin-top: 1rem;
+    }
+  }
+  
+  /* Button icon */
+  .button-icon {
+    margin-right: 0.5rem;
+  }
+  
+  /* Điều chỉnh chiều cao slider cho các kích thước màn hình */
+  .movie-slider {
+    width: 100%;
+    height: 85vh;
+  }
+  
+  @media (max-width: 479px) {
+    .movie-slider {
+      height: 75vh;
+    }
+    .thumbnail-container {
+      bottom: 1rem;
+      gap: 0.35rem;
+    }
+  }
+  
+  @media (min-width: 480px) and (max-width: 767px) {
+    .movie-slider {
+      height: 75vh;
+    }
+    .thumbnail-container {
+      bottom: 1.25rem;
+    }
+  }
+  
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .movie-slider {
+      height: 80vh;
+    }
+    .thumbnail-container {
+      bottom: 1.5rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .movie-slider {
+      height: 85vh;
+    }
+  }
+  
+  /* Movie tags style */
+  .movie-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.75rem;
+    background-color: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(5px);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #fff;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .movie-tag.imdb {
+    background-color: #f5c518;
+    color: #000;
+  }
+  
+  .movie-tag.episode {
+    background-color: rgba(255, 69, 58, 0.85);
+  }
+  
+  /* Movie genres row */
+  .movie-genres {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+  }
+  
+  /* Movie description */
+  .movie-description {
+    max-width: 650px;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+  }
+  
+  /* Mobile adjustments for portrait mode */
+  @media (max-width: 767px) and (orientation: portrait) {
+    .movie-slider {
+      height: 65vh;
+    }
+    
+    .movie-info-container {
+      max-width: 100%;
+      padding-bottom: 0.5rem;
+    }
+    
+    .movie-description {
+      max-height: 2.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .movie-title {
+      font-size: 1.5rem;
+    }
+
+    .movie-origin-title {
+      font-size: 0.8rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .action-buttons {
+      margin-top: 0.75rem;
+    }
+
+    .thumbnail-container {
+      bottom: 0.75rem;
+    }
+  }
+`}</style>
       <Swiper
         modules={[Autoplay, EffectFade]}
         spaceBetween={0}
@@ -294,7 +597,7 @@ export const MovieSlider = memo(({ movies }: MovieSliderProps) => {
         onSlideChange={handleSlideChange}
         autoplay={{ delay: 5000, disableOnInteraction: false }}
         effect="fade"
-        className="w-full h-[50vh] sm:h-[60vh] md:h-[65vh] lg:h-[80vh] xl:h-[90vh]"
+        className="movie-slider"
         fadeEffect={{ crossFade: true }}
       >
         {visibleMovies.map((movie, idx) => {
@@ -304,7 +607,7 @@ export const MovieSlider = memo(({ movies }: MovieSliderProps) => {
               <div className="relative h-full w-full">
                 <div className="absolute inset-0">
                   <Image
-                    src={getOptimizedImageUrl(movie.thumb_url, 'large')}
+                    src={getOptimizedImageUrl(movie.thumb_url, "large")}
                     alt={movie.name}
                     className="object-cover"
                     fill
@@ -312,68 +615,94 @@ export const MovieSlider = memo(({ movies }: MovieSliderProps) => {
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
                     quality={idx === 0 ? 100 : 75}
                     placeholder="blur"
-                    blurDataURL={getImagePlaceholder('backdrop')}
+                    blurDataURL={getImagePlaceholder("backdrop")}
                   />
                 </div>
                 <div className="absolute inset-0 slider-overlay z-[1]" />
                 <div className="absolute inset-0 slider-side-overlay z-[1]" />
                 <div className="absolute bottom-0 left-0 w-full z-[5]">
-                  <div className="container mx-auto px-4 pb-10 sm:pb-14 md:pb-16 lg:pb-20 xl:pb-24">
-                    <div className="max-w-3xl text-white">
-                      <div className="w-full overflow-hidden">
-                        <h1 className="font-bold mb-2 text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white movie-title">
-                          {info?.name || movie.name}
-                        </h1>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 md:gap-2 mb-2 sm:mb-3 text-[10px] sm:text-xs md:text-sm">
-                        {info && getImdbRating(info.imdb) !== '' && (
-                          <span className="px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-yellow-500 rounded text-black font-bold">
+                  <div className="container mx-auto px-4 pb-10 sm:pb-14 md:pb-16 lg:pb-20 xl:pb-28">
+                    <div className="movie-info-container">
+                      <h1 className="movie-title text-white">
+                        {info?.name || movie.name}
+                      </h1>
+                      {info?.origin_name && (
+                        <p className="movie-origin-title">
+                          {info.origin_name}
+                        </p>
+                      )}
+
+                      <div className="flex flex-wrap items-center mb-4">
+                        {info && getImdbRating(info.imdb) !== "" && (
+                          <span className="movie-tag imdb">
                             IMDb {getImdbRating(info.imdb)}
                           </span>
                         )}
                         {(info?.time || movie.time) && (
-                          <span className="px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
-                            {info?.time || movie.time}
-                          </span>
+                          <span className="movie-tag">{info?.time || movie.time}</span>
                         )}
                         {(info?.quality || movie.quality) && (
-                          <span className="px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
-                            {info?.quality || movie.quality || 'HD'}
+                          <span className="movie-tag">
+                            {info?.quality || movie.quality || "HD"}
                           </span>
                         )}
                         {(info?.episode_current || movie.episode_current) && (
-                          <span className="px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-red-500/90 backdrop-blur-sm rounded font-medium text-white">
+                          <span className="movie-tag episode">
                             {info?.episode_current || movie.episode_current}
                           </span>
                         )}
-                        <span className="px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
-                          {info?.lang || movie.lang || 'Vietsub'}
+                        <span className="movie-tag">
+                          {info?.lang || movie.lang || "Vietsub"}
                         </span>
-                        <span className="px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">
-                          {info?.year || movie.year || '2025'}
+                        <span className="movie-tag">
+                          {info?.year || movie.year || "2025"}
                         </span>
                       </div>
+
                       {info && info.category && info.category.length > 0 ? (
-                        <div className="flex flex-wrap gap-1 sm:gap-1.5 md:gap-2 text-white text-[10px] sm:text-xs md:text-sm mb-2 sm:mb-3">
-                          {info.category.map((cat: { name: string }, i: number) => (
-                            <span key={i} className="category-item px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">{cat.name}</span>
-                          ))}
+                        <div className="movie-genres">
+                          {info.category.map(
+                            (cat: { name: string }, i: number) => (
+                              <span
+                                key={i}
+                                className="movie-tag"
+                              >
+                                {cat.name}
+                              </span>
+                            )
+                          )}
                         </div>
                       ) : (
-                        <div className="flex flex-wrap gap-1 sm:gap-1.5 md:gap-2 text-white text-[10px] sm:text-xs md:text-sm mb-2 sm:mb-3">
-                          <span className="px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">Phim Hay</span>
-                          <span className="px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 bg-white/20 backdrop-blur-sm rounded font-medium">Mới Cập Nhật</span>
+                        <div className="movie-genres">
+                          <span className="movie-tag">
+                            Phim Hay
+                          </span>
+                          <span className="movie-tag">
+                            Mới Cập Nhật
+                          </span>
                         </div>
                       )}
-                      <p className="text-white text-[10px] xs:text-xs sm:text-sm md:text-base line-clamp-2 sm:line-clamp-2 md:line-clamp-3 mb-2 sm:mb-3 md:mb-4 shadow-text font-medium">
-                        {info?.content || movie.content || "Đang tải thông tin phim..."}
+
+                      <p className="movie-description line-clamp-2 sm:line-clamp-3 md:line-clamp-4">
+                        {info?.content ||
+                          movie.content ||
+                          "Đang tải thông tin phim..."}
                       </p>
-                      <Link href={`/phim/${movie.slug}`}>
-                        <button className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-3 py-1.5 sm:px-4 sm:py-2 md:px-5 md:py-2.5 rounded-full flex items-center gap-1.5 text-xs sm:text-sm md:text-base transition-all shadow-lg">
-                          <Play className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
-                          <span className="font-bold">Xem Phim</span>
+
+                      <div className="action-buttons">
+                        <Link href={`/phim/${movie.slug}`}>
+                          <button className="watch-movie-button">
+                            <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                            <span>Xem Phim</span>
+                          </button>
+                        </Link>
+                        <button className="add-list-button">
+                          <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 4V20M20 12H4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          <span>Thêm Vào Danh Sách</span>
                         </button>
-                      </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -386,24 +715,16 @@ export const MovieSlider = memo(({ movies }: MovieSliderProps) => {
         {visibleMovies.map((movie, i) => (
           <button
             key={movie._id}
-            className={`group relative w-5 h-5 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 border-2 ${
-              activeIndex === i ? 'border-yellow-500 scale-110 z-10' : 'border-transparent'
-            } rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:border-white hover:scale-105 focus:outline-none`}
+            className={`thumbnail-button ${activeIndex === i ? 'active' : ''}`}
             onClick={() => handleSlideClick(i)}
+            aria-label={`Chuyển đến phim ${movie.name}`}
           >
-            <div className="relative w-full h-full">
-              <Image 
-                src={getOptimizedImageUrl(movie.thumb_url, 'small')} 
-                alt={movie.name} 
-                className="object-cover"
-                fill
-                sizes="(max-width: 640px) 20px, (max-width: 768px) 32px, (max-width: 1024px) 40px, (max-width: 1280px) 48px, 48px"
-                quality={60}
-                placeholder="blur"
-                blurDataURL={getImagePlaceholder('poster')}
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300" />
-            </div>
+            <img 
+              src={getOptimizedImageUrl(movie.thumb_url || movie.poster_url, "small")}
+              alt={movie.name}
+              className="thumbnail-img"
+              loading="lazy"
+            />
           </button>
         ))}
       </div>
